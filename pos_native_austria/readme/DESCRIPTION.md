@@ -1,0 +1,1 @@
+Provides native support for signing receipts.
