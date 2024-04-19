@@ -1,1 +1,0 @@
-- Martin Reisenhofer \<<martin@reisenhofer.biz>\>
