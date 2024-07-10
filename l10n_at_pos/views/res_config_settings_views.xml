@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- res_config_settings_view_form inherit form view -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res_config_settings_view_form.inherit.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="pos_accounting_section" position="after">
+                <block title="RKSV Austria" id="pos_l10n_at">
+                    <setting string="RKSV Austria" help="Enable RKSV Austria">
+                        <field name="asign_enabled"/>
+                    </setting>
+                    <setting string="RKSV Configuration" invisible="not asign_enabled">
+                        <div class="content-group mt16">
+                            <div class="row">
+                                <label string="Method" for="asign_method" class="col-lg-3 o_light_label"/>
+                                <field name="asign_method"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+</odoo>

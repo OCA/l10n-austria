@@ -1,8 +1,8 @@
 {
-    "name": "Point of Sale - Austrian Localization",
+    "name": "POS Austria",
     "version": "17.0.1.0.0",
     "development_status": "Beta",
-    "summary": "POS Extensions needed for Austria, especially for the BMF",
+    "summary": "Austrian POS features for tax authority",
     "category": "Point of sale",
     "author": "Martin Reisenhofer, Odoo Community Association (OCA)",
     "maintainer": "martin-reisenhofer",
@@ -13,5 +13,8 @@
     "application": False,
     "depends": [
         "point_of_sale",
-    ]
+    ],
+    "data": [
+        "views/res_config_settings_views.xml",
+    ],
 }
