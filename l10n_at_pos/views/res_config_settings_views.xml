@@ -11,12 +11,63 @@
                 <block title="RKSV Austria" id="pos_l10n_at">
                     <setting string="RKSV Austria" help="Enable RKSV Austria">
                         <field name="asign_enabled"/>
+                        <div class="content-group mt16" invisible="not asign_enabled">
+                            <field name="asign_state"/>
+                            <div>
+                                <button name="action_asign_assign" class="btn-link"
+                                    icon="oi-arrow-right"
+                                    string="Assign" type="object"
+                                    invisible="asign_state != 'draft'"/>
+                                <button name="action_asign_reset"  class="btn-link"
+                                    icon="oi-arrow-right"
+                                    string="Reset" type="object"
+                                    invisible="asign_state == 'draft'"/>
+                            </div>
+                        </div>
                     </setting>
                     <setting string="RKSV Configuration" invisible="not asign_enabled">
                         <div class="content-group mt16">
                             <div class="row">
                                 <label string="Method" for="asign_method" class="col-lg-3 o_light_label"/>
-                                <field name="asign_method"/>
+                                <field name="asign_method"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row">
+                                <label string="Serial#" for="asign_serial_hex" class="col-lg-3 o_light_label"/>
+                                <field name="asign_serial_hex"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row">
+                                <label string="Fiscal ID" for="asign_fid" class="col-lg-3 o_light_label"/>
+                                <field name="asign_fid"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row">
+                                <label string="POS ID" for="asign_pid" class="col-lg-3 o_light_label"/>
+                                <field name="asign_pid"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row">
+                                <label string="Encryption Key" for="asign_key" class="col-lg-3 o_light_label"/>
+                                <field name="asign_key"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row" invisible="asign_method != 'online'">
+                                <label string="User" for="asign_key" class="col-lg-3 o_light_label"/>
+                                <field name="asign_user"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
+                            </div>
+                            <div class="row" invisible="asign_method != 'online'">
+                                <label string="Password" for="asign_key" class="col-lg-3 o_light_label"/>
+                                <field name="asign_password"
+                                    readonly="asign_state != 'draft'"
+                                    required="asign_enabled"/>
                             </div>
                         </div>
                     </setting>

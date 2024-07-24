@@ -6,7 +6,7 @@
     "category": "Point of sale",
     "author": "Martin Reisenhofer, Odoo Community Association (OCA)",
     "maintainer": "martin-reisenhofer",
-    "website": "https://github.com/OCA/pos",
+    "website": "https://github.com/OCA/l10n_at_pos",
     "license": "LGPL-3",
     "installable": True,
     "auto_install": False,
