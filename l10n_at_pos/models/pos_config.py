@@ -115,7 +115,7 @@ class PosConfig(models.Model):
 
     def action_asign_assign(self):
         configs = self.filtered(lambda c: c.asign_enabled and c.asign_state == 'draft')
-        config_with_open_sessions =  configs.filtered(lambda c: c.has_active_session)
+        config_with_open_sessions = configs.filtered(lambda c: c.has_active_session)
         if config_with_open_sessions:
             raise exceptions.UserError(_('POS %s has open sessions. Close them first.', config_with_open_sessions[0].name))
         # write new state
