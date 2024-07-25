@@ -266,28 +266,28 @@ class PosOrder(models.Model):
                 # if there fits no order for the next sequence number, log an error
                 # and cancel the signing
                 _logger.error('**RKSV** Sequence number mismatch! Last signed order: %s, Current order: %s', last_order.name, self.name)
-                return 0
+                return self.browse()
 
         # sign all unsigned orders, in the right order
-        signed = 0
+        signed_orders = self.browse()
         for order in orders:
             # if the last order was signed, check if the current order is the next in sequence
-            if signed and order.asign_seq != last_order.asign_seq+1:
+            if signed_orders and order.asign_seq != last_order.asign_seq+1:
                 _logger.error('**RKSV** Sequence number mismatch! Last signed order: %s, Current order: %s', last_order.name, order.name)
-                return signed
+                return signed_orders
 
             try:
                 signature = order._asign_create_signature(last_order)
                 order.write(signature)
-                signed += 1
+                signed_orders += order
             except (exceptions.UserError, requests.exceptions.HTTPError):
                 # if there is an exception log it, but don't continue
                 _logger.exception('**RKSV** Error during signing order %s', order.name)
-                return signed
+                return signed_orders
 
             last_order = order
 
-        return signed
+        return signed_orders
 
     def _process_saved_order(self, draft):
         res = super()._process_saved_order(draft)
