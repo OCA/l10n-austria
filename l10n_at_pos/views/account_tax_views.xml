@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- account.tax.group inherit tree view -->
+    <record id="view_tax_group_tree" model="ir.ui.view">
+        <field name="name">account.tax.group.inherit.view.tree</field>
+        <field name="model">account.tax.group</field>
+        <field name="inherit_id" ref="account.view_tax_group_tree"/>
+        <field name="arch" type="xml">
+            <field name="preceding_subtotal" position="after">
+                <field name="asign_type" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_tax_group_form" model="ir.ui.view">
+        <field name="name">account.tax.group.inherit.view.form</field>
+        <field name="model">account.tax.group</field>
+        <field name="inherit_id" ref="account.view_tax_group_form"/>
+        <field name="arch" type="xml">
+            <field name="preceding_subtotal" position="after">
+                <field name="asign_type"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

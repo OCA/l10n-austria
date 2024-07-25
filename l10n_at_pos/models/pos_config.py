@@ -36,7 +36,7 @@ class PosConfig(models.Model):
 
     def _default_asign_pid(self):
         configs = self.env['pos.config'].search([('company_id', '=', self.env.company.id)])
-        return next_sequence(configs, 'asign_pid') or 'K01'
+        return next_sequence(configs, 'asign_pid')
 
     def _default_asign_key(self):
         return base64.b64encode(secrets.token_bytes(AES_KEY_SIZE)).decode()
@@ -133,7 +133,16 @@ class PosConfig(models.Model):
             'asign_state': 'draft'
         })
 
-
+    def _get_self_ordering_data(self):
+        """ Add Austrian RKSV configuration to the POS configuration data. """
+        data = super()._get_self_ordering_data()
+        config = data['config']
+        config.update({
+            'asign_enabled': self.asign_enabled,
+            'asign_state': self.asign_state,
+            'asign_method': self.asign_method
+        })
+        return data
 
 
 

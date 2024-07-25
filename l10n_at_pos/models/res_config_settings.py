@@ -1,3 +1,4 @@
+import re
 from odoo import fields, models, api
 
 
@@ -40,11 +41,15 @@ class ResConfigSettings(models.TransientModel):
             config = record.pos_config_id
             if config:
                 fiscal_pos_id = record.asign_pid
+                # remove all non-alphanumeric characters
+                if fiscal_pos_id:
+                    fiscal_pos_id = re.sub('[^0-9A-Za-z]', '', fiscal_pos_id)
                 config.asign_pid = fiscal_pos_id
                 # not override if asign_pid is empty
                 if fiscal_pos_id:
                     config.sequence_id.name = record.asign_pid
                     config.sequence_id.prefix = f'{record.asign_pid}/'
+                    config.sequence_id.postfix = None
 
     def action_asign_assign(self):
         self.pos_config_id.action_asign_assign()

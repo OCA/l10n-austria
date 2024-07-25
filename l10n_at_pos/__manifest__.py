@@ -12,9 +12,14 @@
     "auto_install": False,
     "application": False,
     "depends": [
+        'l10n_at',
         "point_of_sale",
+        'account'
     ],
     "data": [
         "views/res_config_settings_views.xml",
+        'views/account_tax_views.xml',
+        'views/pos_order_views.xml'
     ],
+    'post_init_hook': 'post_init_hook'
 }
