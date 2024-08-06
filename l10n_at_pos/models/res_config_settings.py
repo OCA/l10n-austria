@@ -14,6 +14,7 @@ class ResConfigSettings(models.TransientModel):
     asign_fid = fields.Char(related='pos_config_id.asign_fid', readonly=False)
     asign_pid = fields.Char(compute='_compute_asign', inverse='_inverse_asign_pid')
     asign_key = fields.Char(related='pos_config_id.asign_key', readonly=False)
+    asign_cert = fields.Binary(related='pos_config_id.asign_cert', readonly=False)
 
     asign_user = fields.Char(related='pos_config_id.asign_user', readonly=False)
     asign_password = fields.Char(related='pos_config_id.asign_password', readonly=False)

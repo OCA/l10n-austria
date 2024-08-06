@@ -69,6 +69,8 @@ class PosConfig(models.Model):
                             compute="_compute_asign_crc",
                             help='Checksum of the encryption key.', copy=False, store=True)
 
+    asign_cert = fields.Binary('a.sign Certificate', help='Certificate for the POS system.')
+
     asign_user = fields.Char('a.sign User')
     asign_password = fields.Char('a.sign Password')
 
@@ -143,6 +145,32 @@ class PosConfig(models.Model):
             'asign_method': self.asign_method
         })
         return data
+
+    def _asign_dep_create(self, dep_export):
+        dep = {
+            "Belege-Gruppe": [
+                {
+                    "Signaturzertifikat" : "",
+                    "Zertifizierungsstellen" : [],
+                    "Belege-kompakt" : dep_export
+                }
+            ]
+        }
+        return dep
+
+    def _asign_dep_export(self):
+        self.ensure_one()
+
+        dep_export = [
+            r['asign_dep'] for r in self.env['pos.order'].search_read([
+                    ('config_id', '=', self.id),
+                    ('asign_state', '=', 's')
+                ], ['asign_dep'], order="asign_seq asc")
+        ]
+
+        return self._asign_dep_create(dep_export)
+
+
 
 
 
