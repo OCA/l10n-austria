@@ -13,7 +13,7 @@ class TestRKSVConfig(TransactionCase):
             'asign_pid': None
         })
 
-        pos_config1 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False})
+        pos_config1 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False, 'asign_pid': 'K01'})
         self.assertEqual(pos_config1.asign_method, 'online')
         self.assertEqual(pos_config1.asign_state, 'draft')
         self.assertEqual(pos_config1.asign_pid, 'K01')

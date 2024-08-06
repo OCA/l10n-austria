@@ -5,7 +5,7 @@ import base64
 import pytz
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import requests
-from odoo import _, fields, models, exceptions
+from odoo import _, fields, models, exceptions, api
 
 _logger = logging.getLogger(__name__)
 
@@ -19,8 +19,8 @@ except pytz.UnknownTimeZoneError:
 def asign_b64urldecode_nopadding(v):
     missing_padding = len(v) % 4
     if missing_padding != 0:
-        v += b'='* (4 - missing_padding)
-    return base64.urlsafe_b64decode(v).decode()
+        v += '=' * (4 - missing_padding)
+    return base64.urlsafe_b64decode(v)
 
 def asign_float(v):
     return f"{v:0.2f}".replace(".",",")
@@ -59,8 +59,18 @@ class PosOrder(models.Model):
     asign_qrcode = fields.Char('a.sign QR-Code', help='The QR code of the RKSV signature.', index=True, readonly=True)
     asign_dep = fields.Char('a.sign DEP', help='The DEP of the RKSV signature export.', readonly=True)
     asign_serial = fields.Char('a.sign Serial', help='The serial number of the RKSV component.', readonly=True)
-    asign_seq = fields.Char('a.sign Sequence', help='The Sequence number of the RKSV signature export.', readonly=True, index=True)
+    asign_seq = fields.Integer('a.sign Sequence', help='The Sequence number of the RKSV signature export.', readonly=True, index=True)
 
+    @api.model
+    def _order_fields(self, ui_order):
+        res = super(PosOrder, self)._order_fields(ui_order)
+        res.update({
+            'asign_type': ui_order.get('asign_type'),
+            'asign_state': ui_order.get('asign_state'),
+            'asign_qrcode': ui_order.get('asign_qrcode'),
+            'asign_serial': ui_order.get('asign_serial')
+        })
+        return res
 
     def _export_for_ui(self, order):
         """ ensure that order is exported with signature information """
@@ -156,9 +166,9 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             receipt_id = f'{config.asign_pid}{self.asign_seq}'
-            turnover_hash = hashlib.sha256(receipt_id.encode()).digest()[:16]
+            turnover_ctr = hashlib.sha256(receipt_id.encode()).digest()[:16]
             turnover_bin = struct.pack(">qq", asign_counter, 0)
-            cipher = Cipher(algorithms.AES(config.asign_key), modes.CTR(turnover_hash))
+            cipher = Cipher(algorithms.AES(base64.b64decode(config.asign_key)), modes.CTR(turnover_ctr))
             encryptor = cipher.encryptor()
             encrypted_turnover = encryptor.update(turnover_bin) + encryptor.finalize()
             encoded_turnover = base64.b64encode(encrypted_turnover[:8]).decode()
@@ -199,7 +209,7 @@ class PosOrder(models.Model):
         url = f'{ASIGN_ENDPOINT}/{config.asign_user}/Sign/JWS'
         payload = {
             'password': config.asign_password,
-            'jws_payload': data['asign_dep']
+            'jws_payload': data['asign_qrcode']
         }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
@@ -279,6 +289,7 @@ class PosOrder(models.Model):
             try:
                 signature = order._asign_create_signature(last_order)
                 order.write(signature)
+                order.flush_model()
                 signed_orders += order
             except (exceptions.UserError, requests.exceptions.HTTPError):
                 # if there is an exception log it, but don't continue
