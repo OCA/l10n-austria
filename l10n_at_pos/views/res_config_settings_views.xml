@@ -57,24 +57,6 @@
                                     readonly="asign_state != 'draft'"
                                     required="asign_enabled"/>
                             </div>
-                            <div class="row">
-                                <label string="Certificate" for="asign_cert" class="col-lg-3 o_light_label"/>
-                                <field name="asign_cert"
-                                    readonly="asign_state != 'draft'"
-                                    required="asign_enabled and asign_method == 'online'"/>
-                            </div>
-                            <div class="row" invisible="asign_method != 'online'">
-                                <label string="User" for="asign_key" class="col-lg-3 o_light_label"/>
-                                <field name="asign_user"
-                                    readonly="asign_state != 'draft'"
-                                    required="asign_enabled"/>
-                            </div>
-                            <div class="row" invisible="asign_method != 'online'">
-                                <label string="Password" for="asign_key" class="col-lg-3 o_light_label"/>
-                                <field name="asign_password"
-                                    readonly="asign_state != 'draft'"
-                                    required="asign_enabled"/>
-                            </div>
                         </div>
                     </setting>
                 </block>

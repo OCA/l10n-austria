@@ -69,11 +69,6 @@ class PosConfig(models.Model):
                             compute="_compute_asign_crc",
                             help='Checksum of the encryption key.', copy=False, store=True)
 
-    asign_cert = fields.Binary('a.sign Certificate', help='Certificate for the POS system.')
-
-    asign_user = fields.Char('a.sign User')
-    asign_password = fields.Char('a.sign Password')
-
     _sql_constraints = [
         (
             'unique_asign_pid', 'UNIQUE(company_id, asign_pid)',
@@ -105,6 +100,12 @@ class PosConfig(models.Model):
                 if not len(base64.b64decode(config.asign_key)) == AES_KEY_SIZE:
                     raise exceptions.ValidationError(
                         f'Austrian RKSV activated but encryption key has invalid length ({len(config.asign_key)} != 32) for POS {config.name}')
+
+                # check cert
+                if config.asign_method == 'online':
+                    self.env['asign.cert']._get_cert(config.asign_serial_hex)
+
+
 
     @api.depends('asign_key')
     def _compute_asign_crc(self):

@@ -205,6 +205,7 @@ class PosOrder(models.Model):
         config = self.session_id.config_id
         data = self._asign_prepare_signature(last_order)
 
+
         # build url
         url = f'{ASIGN_ENDPOINT}/{config.asign_user}/Sign/JWS'
         payload = {

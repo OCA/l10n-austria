@@ -17,9 +17,11 @@
         'account'
     ],
     "data": [
+        'security/ir.model.access.csv',
         "views/res_config_settings_views.xml",
         'views/account_tax_views.xml',
-        'views/pos_order_views.xml'
+        'views/pos_order_views.xml',
+        'views/asign_views.xml',
     ],
     'post_init_hook': 'post_init_hook'
 }
