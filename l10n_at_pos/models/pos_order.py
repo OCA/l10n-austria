@@ -204,12 +204,13 @@ class PosOrder(models.Model):
         """ add the signature the the prepared data and return it """
         config = self.session_id.config_id
         data = self._asign_prepare_signature(last_order)
-
+        asign_serial = config.asign_serial_hex
+        user, password = self.env['asign.cert']._get_login(asign_serial)
 
         # build url
-        url = f'{ASIGN_ENDPOINT}/{config.asign_user}/Sign/JWS'
+        url = f'{ASIGN_ENDPOINT}/{user}/Sign/JWS'
         payload = {
-            'password': config.asign_password,
+            'password': password,
             'jws_payload': data['asign_qrcode']
         }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -238,7 +239,8 @@ class PosOrder(models.Model):
         data.update({
             'asign_state': 's',
             'asign_qrcode': f'{data["asign_qrcode"]}_{signation}',
-            'asign_dep': result
+            'asign_dep': result,
+            'asign_serial': asign_serial
         })
         return data
 

@@ -31,6 +31,18 @@ class TestAsignCommonMixin():
             'journal_id': self.cash_journal.id,
         })
 
+        # create certificate
+        asign_cert = test_config.pop('asign_cert', None)
+        asign_user = test_config.pop('asign_user', None)
+        asign_password = test_config.pop('asign_password', None)
+        if asign_cert:
+            self.asign_cert = self.env['asign.cert'].create({
+                'name': test_config['asign_serial_hex'],
+                'cert': asign_cert,
+                'user': asign_user,
+                'password': asign_password
+            })
+
         # create config
         config_data = {
               'module_pos_restaurant': False,
@@ -116,6 +128,8 @@ class TestAsignCommonMixin():
         # check the state
         self.assertEqual(len(order), 1, 'There should be one order created')
         self.assertEqual(order.asign_state, 's', 'The order should be signed')
+        # check if serial is set
+        self.assertEqual(order.asign_serial, self.asign_cert.serial_hex, 'The serial should be set')
         # check the turnover
         last_asign_counter = int(self.last_order.asign_counter) if self.last_order else 0
         self.assertEqual(order.asign_counter, str(last_asign_counter + int(order.amount_total*100)), 'Check the turnover')

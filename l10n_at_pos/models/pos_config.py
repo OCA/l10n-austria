@@ -75,7 +75,7 @@ class PosConfig(models.Model):
             'Fiscal POS ID hast to be unique for the company')
     ]
 
-    @api.constrains('asign_serial_hex', 'asign_fid', 'asign_pid', 'asign_key', 'asign_user', 'asign_password')
+    @api.constrains('asign_serial_hex', 'asign_fid', 'asign_pid', 'asign_key')
     def _check_asign_config(self):
         for config in self:
             if config.asign_enabled:
