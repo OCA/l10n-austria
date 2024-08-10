@@ -31,17 +31,20 @@ class TestAsignCommonMixin():
             'journal_id': self.cash_journal.id,
         })
 
-        # create certificate
+        # get/create certificate
         asign_cert = test_config.pop('asign_cert', None)
         asign_user = test_config.pop('asign_user', None)
         asign_password = test_config.pop('asign_password', None)
         if asign_cert:
-            self.asign_cert = self.env['asign.cert'].create({
-                'name': test_config['asign_serial_hex'],
-                'cert': asign_cert,
-                'user': asign_user,
-                'password': asign_password
-            })
+            AsignCert = self.env['asign.cert']
+            self.asign_cert = AsignCert.search([('serial_hex', '=', test_config['asign_serial_hex'])], limit=1)
+            if not self.asign_cert:
+                self.asign_cert = self.env['asign.cert'].create({
+                    'name': test_config['asign_serial_hex'],
+                    'cert': asign_cert,
+                    'user': asign_user,
+                    'password': asign_password
+                })
 
         # create config
         config_data = {

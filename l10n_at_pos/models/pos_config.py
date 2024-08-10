@@ -36,7 +36,7 @@ class PosConfig(models.Model):
 
     def _default_asign_pid(self):
         configs = self.env['pos.config'].search([('company_id', '=', self.env.company.id)])
-        return next_sequence(configs, 'asign_pid')
+        return next_sequence(configs, 'asign_pid') or 'K01'
 
     def _default_asign_key(self):
         return base64.b64encode(secrets.token_bytes(AES_KEY_SIZE)).decode()
@@ -56,14 +56,11 @@ class PosConfig(models.Model):
     asign_serial_hex = fields.Char('a.sign Serial',
                                    help='Serial number of the certificate in hex format.')
 
-    asign_fid = fields.Char('a.sign Fiscal ID', help='VAT or tax number of the company for the POS.',
-                            default=_default_asign_fid)
+    asign_fid = fields.Char('a.sign Fiscal ID', help='VAT or tax number of the company for the POS.')
 
     asign_pid = fields.Char('a.sign POS ID',
-                            default=_default_asign_pid,
                             help="Fiscal ID of the POS system inside the company, and prefix of the order number.", copy=False)
-    asign_key = fields.Char('a.sign Encryption Key', help="The AES encryption key of the journal.", copy=False,
-                            default=_default_asign_key)
+    asign_key = fields.Char('a.sign Encryption Key', help="The AES encryption key of the journal.", copy=False)
 
     asign_crc = fields.Char('a.sign Checksum',
                             compute="_compute_asign_crc",
@@ -75,10 +72,25 @@ class PosConfig(models.Model):
             'Fiscal POS ID hast to be unique for the company')
     ]
 
-    @api.constrains('asign_serial_hex', 'asign_fid', 'asign_pid', 'asign_key')
+    @api.model
+    def _set_asign_defaults(self, record):
+        record.ensure_one()
+        if record.asign_enabled:
+            if not record.asign_fid:
+                record.asign_fid = self._default_asign_fid()
+            if not record.asign_pid:
+                record.asign_pid = self._default_asign_pid()
+            if not record.asign_key:
+                record.asign_key = self._default_asign_key()
+
+    @api.constrains('asign_enabled')
     def _check_asign_config(self):
         for config in self:
             if config.asign_enabled:
+                # check if all defaults are set
+                self._set_asign_defaults(config)
+
+                # check if all required fields are set
                 if not config.asign_method:
                     raise exceptions.ValidationError(
                         f'Austrian RKSV activated but method is empty for POS {config.name}')
@@ -104,8 +116,6 @@ class PosConfig(models.Model):
                 # check cert
                 if config.asign_method == 'online':
                     self.env['asign.cert']._get_cert(config.asign_serial_hex)
-
-
 
     @api.depends('asign_key')
     def _compute_asign_crc(self):

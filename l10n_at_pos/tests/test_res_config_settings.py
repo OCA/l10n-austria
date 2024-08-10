@@ -5,20 +5,29 @@ from odoo.tests.common import TransactionCase, Form
 class TestRKSVConfig(TransactionCase):
     ''' Test configuration of RKSV settings '''
 
+    def setUp(self):
+        super().setUp()
+        # create a certificate
+        self.env['asign.cert'].create({
+            'name': 'a',
+            'cert_type': 'card'
+        })
+
     def test_rksv_pid(self):
         ''' Test the prediction of next RKSV PID '''
+
         # for testing we need to reset the sequence
         self.env['pos.config'].search([]).write({
             'asign_enabled': False,
             'asign_pid': None
         })
 
-        pos_config1 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False, 'asign_pid': 'K01'})
+        pos_config1 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False, 'asign_serial_hex': 'a', 'asign_enabled': True})
         self.assertEqual(pos_config1.asign_method, 'online')
         self.assertEqual(pos_config1.asign_state, 'draft')
         self.assertEqual(pos_config1.asign_pid, 'K01')
 
-        pos_config2 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False})
+        pos_config2 = pos_config1.copy()
         self.assertEqual(pos_config2.asign_method, 'online')
         self.assertEqual(pos_config2.asign_state, 'draft')
         self.assertEqual(pos_config2.asign_pid, 'K02')
@@ -39,8 +48,7 @@ class TestRKSVConfig(TransactionCase):
             form.pos_config_id = pos_config1
             form.asign_enabled = True
             form.asign_serial_hex = '0000000a'
-            form.asign_user = 'testuser'
-            form.asign_password = 'password'
+            form.asign_pid = 'TESTK01'
 
         # save it again (to double check)
         with Form(self.env['res.config.settings']) as form:
@@ -49,8 +57,6 @@ class TestRKSVConfig(TransactionCase):
             self.assertEqual(form.asign_method, 'online')
             self.assertEqual(form.asign_state, 'draft')
             self.assertEqual(form.asign_serial_hex, 'a')
-            self.assertEqual(form.asign_user, 'testuser')
-            self.assertEqual(form.asign_password, 'password')
             self.assertTrue(form.asign_key, 'Check if key is generated')
 
         # check if sequence is updated
