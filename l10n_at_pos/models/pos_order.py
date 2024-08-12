@@ -6,6 +6,7 @@ import pytz
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import requests
 from odoo import _, fields, models, exceptions, api
+from odoo.tools import float_is_zero
 
 _logger = logging.getLogger(__name__)
 
@@ -171,6 +172,12 @@ class PosOrder(models.Model):
             asign_type = 't'
             encoded_turnover = B64_TRA
         else:
+            # check 0 document
+            if float_is_zero(self.amount_total, precision_rounding=self.currency_id.rounding) == 0:
+                asign_type = '0'
+                if not last_order:
+                    asign_type = 's'
+
             receipt_id = f'{config.asign_pid}{self.asign_seq}'
             turnover_ctr = hashlib.sha256(receipt_id.encode()).digest()[:16]
             turnover_bin = struct.pack(">qq", asign_counter, 0)
