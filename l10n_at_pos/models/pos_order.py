@@ -63,6 +63,7 @@ class PosOrder(models.Model):
 
     @api.model
     def _order_fields(self, ui_order):
+        """ get fields from ui_order from pos """
         res = super(PosOrder, self)._order_fields(ui_order)
         res.update({
             'asign_type': ui_order.get('asign_type'),
@@ -79,7 +80,8 @@ class PosOrder(models.Model):
             'asign_type': order.asign_type,
             'asign_state': order.asign_state,
             'asign_qrcode': order.asign_qrcode,
-            'asign_serial': order.asign_serial
+            'asign_serial': order.asign_serial,
+            'asign_ref': order.name
         })
         return res
 
@@ -160,9 +162,13 @@ class PosOrder(models.Model):
         if last_order:
             asign_counter = asign_counter + int(last_order.asign_counter)
 
-        if self.asign_type == 'c':
+        # determine type and encode the turnover
+        asign_type = 'o'
+        if self.asign_type == 'c' or len(self.refunded_order_ids) != 0:
+            asign_type = 'c'
             encoded_turnover = B64_STO
         elif self.asign_type == 't':
+            asign_type = 't'
             encoded_turnover = B64_TRA
         else:
             receipt_id = f'{config.asign_pid}{self.asign_seq}'
@@ -197,7 +203,8 @@ class PosOrder(models.Model):
         return {
             'asign_serial': config.asign_serial_hex,
             'asign_counter': str(asign_counter),
-            'asign_qrcode': asign_qrcode
+            'asign_qrcode': asign_qrcode,
+            'asign_type': asign_type
         }
 
     def _asign_create_signature(self, last_order):
@@ -267,7 +274,7 @@ class PosOrder(models.Model):
         last_order = self.browse(last_order_id) if last_order_id else self.browse()
 
         # check if the sequence number is valid
-        if last_seq+1 == self.asign_seq:
+        if last_seq+1 == self.asign_seq or not last_order:
             orders = self
         else:
             # something is wrong try to search all not unsigned orders
@@ -311,3 +318,32 @@ class PosOrder(models.Model):
             self._asign_add_signature()
 
         return res
+
+    @api.model
+    def create_from_ui(self, orders, draft=False):
+        order_values = super(PosOrder, self).create_from_ui(orders, draft)
+        if not draft:
+            order_ids = [o['id'] for o in order_values]
+
+            # query signature for all orders
+            order_asign_values = self.env['pos.order'].search_read(domain=[('id', 'in', order_ids), ('asign_state', '=', 's')],
+                            fields=['id',
+                                    'asign_type',
+                                    'asign_state',
+                                    'asign_qrcode',
+                                    'asign_serial',
+                                    'name'], load=False)
+
+            # build map
+            if order_asign_values:
+                order_asign_values = {o['id']: o for o in order_asign_values}
+
+                # update order values with signature data
+                for values in order_values:
+                    asign_values = order_asign_values.get(values['id'], None)
+                    if asign_values:
+                        asign_ref = asign_values.pop('name')
+                        asign_values['asign_ref'] = asign_ref
+                        values.update(asign_values)
+
+        return order_values

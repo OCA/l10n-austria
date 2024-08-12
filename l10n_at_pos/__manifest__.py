@@ -19,10 +19,7 @@
     "assets": {
         "point_of_sale._assets_pos": [
             "l10n_at_pos/static/src/**/*",
-        ],
-        "web.assets_tests": [
-            "l10n_at_pos/static/tests/**/*",
-        ],
+        ]
     },
     "data": [
         'security/ir.model.access.csv',

@@ -5,14 +5,13 @@ from odoo import fields, models, api
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    asign_state = fields.Selection(related='pos_config_id.asign_state', compute='_compute_asign',
+                                   readonly=True)
+
     asign_enabled = fields.Boolean(compute='_compute_asign', inverse='_inverse_asign')
 
     asign_method = fields.Selection([('card', 'Card'),
                                      ('online', 'Online')], compute='_compute_asign', inverse='_inverse_asign')
-
-    asign_state = fields.Selection([('draft', 'Draft'),
-                                    ('assigned', 'Assigned'),
-                                    ('active', 'Active')], compute='_compute_asign')
 
     asign_serial_hex = fields.Char('a.sign Serial', help="Serial number of the certificate in hex format.",
                                    compute='_compute_asign', inverse='_inverse_asign')
@@ -32,7 +31,6 @@ class ResConfigSettings(models.TransientModel):
             config = record.pos_config_id
             record.asign_enabled = config.asign_enabled
             record.asign_method = config.asign_method
-            record.asign_state = config.asign_state
             record.asign_serial_hex = config.asign_serial_hex
             record.asign_fid = config.asign_fid
             record.asign_pid = config.asign_pid
@@ -49,7 +47,7 @@ class ResConfigSettings(models.TransientModel):
                 }
 
                 # only allow update if state is draft
-                if not record.asign_state or record.asign_state == 'draft':
+                if not config.asign_state or config.asign_state == 'draft':
 
                     # update basic fields
                     update.update({
@@ -81,8 +79,10 @@ class ResConfigSettings(models.TransientModel):
 
 
     def action_asign_assign(self):
+        self.ensure_one()
         self.pos_config_id.action_asign_assign()
 
     def action_asign_reset(self):
+        self.ensure_one()
         self.pos_config_id.action_asign_reset()
 

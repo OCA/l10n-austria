@@ -8,6 +8,11 @@
                 <t t-if="props.data['asign_state'] == 'u'">
                     <b>The receipt could not be signed and is therefore not valid!</b>
                 </t>
+                <t t-elif="props.data['asign_state'] == 's'">
+                    <br/><br/>
+                    <img id="asign_qrcode" t-att-src="props.data.asign_qrcode_img" class="pos-receipt-qrcode"/>
+                    <div class="pos-receipt-qrcode-text"><t t-esc="props.data['asign_ref']"/>: <t t-esc="props.data['asign_serial']"/></div>
+                </t>
             </t>
         </xpath>
     </t>

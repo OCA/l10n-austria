@@ -182,6 +182,10 @@ class PosConfig(models.Model):
         return self._asign_dep_create(dep_export)
 
 
+    def _check_asign_before_creating_new_session(self):
+        if self.asign_enabled and self.asign_state == 'draft':
+            raise exceptions.ValidationError(_('POS %s has enabled a.sign but certificate is not assigned.', self.name))
 
-
-
+    def _check_before_creating_new_session(self):
+        super()._check_before_creating_new_session(self)
+        self._check_asign_before_creating_new_session()
