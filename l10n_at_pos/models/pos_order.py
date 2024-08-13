@@ -173,7 +173,7 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             # check 0 document
-            if amounts['amount'] == 0.0:
+            if not amounts['amount']:
                 asign_type = '0'
                 # check if it is first
                 if not last_order:
