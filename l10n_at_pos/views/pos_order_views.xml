@@ -13,15 +13,13 @@
                             <field name="asign_type"/>
                             <field name="asign_state"/>
                             <field name="asign_serial"/>
-                        </group>
-                        <group>
                             <field name="asign_seq"/>
                             <field name="asign_counter"/>
                         </group>
-                    </group>
-                    <group>
-                          <field name="asign_dep" colspan="4" invisible="not asign_dep"/>
-                          <field name="asign_qrcode" colspan="4" invisible="not asign_qrcode"/>
+                        <group>
+                            <field name="asign_dep" />
+                            <field name="asign_qrcode" widget="text" />
+                        </group>
                     </group>
                 </page>
             </notebook>

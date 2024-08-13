@@ -187,5 +187,5 @@ class PosConfig(models.Model):
             raise exceptions.ValidationError(_('POS %s has enabled a.sign but certificate is not assigned.', self.name))
 
     def _check_before_creating_new_session(self):
-        super()._check_before_creating_new_session(self)
+        super()._check_before_creating_new_session()
         self._check_asign_before_creating_new_session()

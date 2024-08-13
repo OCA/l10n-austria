@@ -10,7 +10,7 @@ patch(Order.prototype, {
     // @Override for initial setup of asign
     setup() {
         super.setup(...arguments);
-        if (this.pos.config.asign_enabled && this.pos.config.asign_state != 'draft') {
+        if (this.pos.config.asign_enabled && this.pos.config.asign_state !== 'draft') {
             this.asign_state = this.asign_state || 'u';
             this.asign_serial = this.asign_serial || '';
             this.asign_qrcode = this.asign_qrcode || '';
@@ -50,6 +50,26 @@ patch(Order.prototype, {
 
 
 patch(PosStore.prototype, {
+
+    async push_single_order(order) {
+        // ensure all other orders are pushed before pushing a new order.
+        // That's import to ensure the right order of the orders on the server.
+        if (this.config.asign_enabled
+            && this.config.asign_state !== 'draft'
+            && this.db.get_orders().length) {
+            try {
+                await this.push_orders();
+            } catch (error) {
+                // if there was an error pushing the orders,
+                // we still want to save the order for the next transfer
+                this.db.add_order(order.export_as_JSON());
+                throw error;
+            }
+        } else {
+            // everything fine use the default way to push the order
+            return await super.push_single_order(order);
+        }
+    },
 
     async _save_to_server(orders, options) {
         const serverIds = await super._save_to_server(orders, options);

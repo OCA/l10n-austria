@@ -58,7 +58,7 @@ class PosOrder(models.Model):
 
     asign_counter = fields.Char('a.sign Counter', help='The turnover counter of the RKSV signature.', readonly=True)
     asign_qrcode = fields.Char('a.sign QR-Code', help='The QR code of the RKSV signature.', index=True, readonly=True)
-    asign_dep = fields.Char('a.sign DEP', help='The DEP of the RKSV signature export.', readonly=True)
+    asign_dep = fields.Text('a.sign DEP', help='The DEP of the RKSV signature export.', readonly=True)
     asign_serial = fields.Char('a.sign Serial', help='The serial number of the RKSV component.', readonly=True)
     asign_seq = fields.Integer('a.sign Sequence', help='The Sequence number of the RKSV signature export.', readonly=True, index=True)
 
@@ -173,8 +173,9 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             # check 0 document
-            if float_is_zero(self.amount_total, precision_rounding=self.currency_id.rounding) == 0:
+            if float_is_zero(self.amount_total, precision_rounding=self.currency_id.rounding):
                 asign_type = '0'
+                # check if it is first
                 if not last_order:
                     asign_type = 's'
 
@@ -216,10 +217,8 @@ class PosOrder(models.Model):
 
     def _asign_create_signature(self, last_order):
         """ add the signature the the prepared data and return it """
-        config = self.session_id.config_id
         data = self._asign_prepare_signature(last_order)
-        asign_serial = config.asign_serial_hex
-        user, password = self.env['asign.cert']._get_login(asign_serial)
+        user, password = self.env['asign.cert']._get_login(data['asign_serial'])
 
         # build url
         url = f'{ASIGN_ENDPOINT}/{user}/Sign/JWS'
@@ -253,8 +252,7 @@ class PosOrder(models.Model):
         data.update({
             'asign_state': 's',
             'asign_qrcode': f'{data["asign_qrcode"]}_{signation}',
-            'asign_dep': result,
-            'asign_serial': asign_serial
+            'asign_dep': result
         })
         return data
 

@@ -12,6 +12,9 @@
                     <br/><br/>
                     <img id="asign_qrcode" t-att-src="props.data.asign_qrcode_img" class="pos-receipt-qrcode"/>
                     <div class="pos-receipt-qrcode-text"><t t-esc="props.data['asign_ref']"/>: <t t-esc="props.data['asign_serial']"/></div>
+                    <div t-if="props.data['asign_type'] == '0'" class="pos-receipt-qrcode-text">NULLBELEG</div>
+                    <div t-if="props.data['asign_type'] == 's'" class="pos-receipt-qrcode-text">STARTBELEG</div>
+                    <div t-if="props.data['asign_type'] == 'c'" class="pos-receipt-qrcode-text">STORNO</div>
                 </t>
             </t>
         </xpath>
