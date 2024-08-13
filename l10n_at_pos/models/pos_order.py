@@ -6,7 +6,7 @@ import pytz
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import requests
 from odoo import _, fields, models, exceptions, api
-from odoo.tools import float_is_zero
+
 
 _logger = logging.getLogger(__name__)
 
@@ -173,7 +173,7 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             # check 0 document
-            if float_is_zero(self.amount_total, precision_rounding=self.currency_id.rounding):
+            if amounts['amount'] == 0.0:
                 asign_type = '0'
                 # check if it is first
                 if not last_order:
