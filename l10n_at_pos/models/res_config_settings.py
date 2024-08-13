@@ -69,6 +69,7 @@ class ResConfigSettings(models.TransientModel):
                     # not override if asign_pid is empty
                     if fiscal_pid:
                         update['asign_pid'] = fiscal_pid
+                        config.sequence_id.implementation = 'no_gap'
                         config.sequence_id.name = fiscal_pid
                         config.sequence_id.prefix = f'{fiscal_pid}/'
                         config.sequence_id.suffix = None
