@@ -306,7 +306,7 @@ class PosOrder(models.Model):
                 order.write(signature)
                 order.flush_model()
                 signed_orders += order
-            except (exceptions.UserError, requests.exceptions.HTTPError):
+            except (exceptions.UserError, requests.exceptions.RequestException):
                 # if there is an exception log it, but don't continue
                 _logger.exception('**RKSV** Error during signing order %s', order.name)
                 return signed_orders
