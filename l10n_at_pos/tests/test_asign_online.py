@@ -9,7 +9,7 @@ from .regcheck.regcheck import RegChecker
 _logger = logging.getLogger(__name__)
 
 
-@tagged('integration', '-standard')
+@tagged('integration', '-standard', '-at_install')
 class TestAsignOnline(TransactionCase, TestAsignCommonMixin, TestMixin):
     ''' Test the enryption of RKSV '''
 
