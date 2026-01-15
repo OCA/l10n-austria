@@ -22,7 +22,13 @@ class TestRKSVConfig(TransactionCase):
             'asign_pid': None
         })
 
-        pos_config1 = self.env['pos.config'].create({'name': 'Test Config1', 'module_pos_restaurant': False, 'asign_serial_hex': 'a', 'asign_enabled': True})
+        pos_config1 = self.env['pos.config'].create({
+            'name': 'Test Config1', 
+            'module_pos_restaurant': False, 
+            'asign_serial_hex': 'a', 
+            'asign_enabled': True,
+            'asign_fid': 'ATU63545569'
+        })
         self.assertEqual(pos_config1.asign_method, 'online')
         self.assertEqual(pos_config1.asign_state, 'draft')
         self.assertEqual(pos_config1.asign_pid, 'K01')
@@ -49,6 +55,7 @@ class TestRKSVConfig(TransactionCase):
             form.asign_enabled = True
             form.asign_serial_hex = '0000000a'
             form.asign_pid = 'TESTK01'
+            form.asign_fid = 'ATU63545569'
 
         # save it again (to double check)
         with Form(self.env['res.config.settings']) as form:
