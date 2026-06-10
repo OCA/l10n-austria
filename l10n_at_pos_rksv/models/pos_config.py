@@ -358,10 +358,36 @@ class PosConfig(models.Model):
             raise ValidationError(self.env._("Created zero-receipt was not signed."))
         return zero_order
 
+    def _asign_repair_cancelled_names(self):
+        """Restore names of signed orders overwritten by a concurrent cancel.
+
+        A lost-update race can overwrite state and name of an already signed
+        order with ``cancel``/``'/'``. The signature covers the original
+        amounts, so only the name is restored from the sequence number.
+        """
+        self.ensure_one()
+        orders = self.env["pos.order"].search(
+            [
+                ("config_id", "=", self.id),
+                ("state", "=", "cancel"),
+                ("asign_state", "=", "s"),
+                ("name", "=", "/"),
+            ]
+        )
+        for order in orders:
+            order.name = order._compute_order_name()
+            _logger.warning(
+                "**RKSV** restored name %s of signed cancelled order for POS %s",
+                order.name,
+                self.name,
+            )
+
     def _asign_sign_missed(self):
         """Sign orders that were created but not signed yet."""
         self.ensure_one()
         pos_order_model = self.env["pos.order"]
+
+        self._asign_repair_cancelled_names()
 
         last_signed = pos_order_model.search(
             [
@@ -378,13 +404,15 @@ class PosConfig(models.Model):
                 [
                     ("config_id", "=", self.id),
                     ("sequence_number", "=", next_seq),
-                    ("state", "in", ["paid", "done"]),
+                    ("state", "in", ["paid", "done", "cancel"]),
                 ],
                 limit=1,
             )
             if not next_order:
                 return
 
+            if next_order.state == "cancel":
+                next_order._asign_prepare_cancel()
             next_order._asign_sign_and_check_one()
             if next_order.asign_state != "s":
                 _logger.warning(

@@ -138,6 +138,39 @@ class PosOrder(models.Model):
         ]
         return res
 
+    def write(self, vals):
+        # A concurrent cancel request (sync at session close, cancel from a
+        # second device, remove from kiosk) can read an order as draft while
+        # the payment transaction signs it and holds the row lock during the
+        # external A-Trust call. Its blocked write would then overwrite the
+        # state and name of the already signed order. Strip those values for
+        # signed orders instead of losing the receipt.
+        protected = {
+            key: vals[key]
+            for key, values in (("state", ("draft", "cancel")), ("name", ("/",)))
+            if vals.get(key) in values
+        }
+        if not protected:
+            return super().write(vals)
+
+        signed = self.filtered(lambda o: o.asign_state == "s" or o.asign_seq)
+        if not signed:
+            return super().write(vals)
+
+        _logger.error(
+            "**RKSV** Prevented overwrite of %s on signed orders %s",
+            protected,
+            signed.mapped("name"),
+        )
+        res = True
+        safe_vals = {k: v for k, v in vals.items() if k not in protected}
+        if safe_vals:
+            res = super(PosOrder, signed).write(safe_vals)
+        unsigned = self - signed
+        if unsigned:
+            res = super(PosOrder, unsigned).write(vals)
+        return res
+
     def _compute_order_name(self, session=None):
         if self.asign_state or self.config_id.asign_enabled:
             session = session or self.session_id
@@ -288,6 +321,30 @@ class PosOrder(models.Model):
         )
         return data
 
+    def _asign_prepare_cancel(self):
+        """Prepare a cancelled order holding a receipt number for signing.
+
+        In Odoo 19 every order consumes a sequence number at creation, so a
+        cancelled order has to show up as a signed receipt in the DEP to keep
+        the receipt range gapless. Orders without any payment are zeroed
+        first; the missing name is restored from the sequence number.
+        """
+        self.ensure_one()
+        if self.currency_id.is_zero(self.amount_paid):
+            self.lines.write(
+                {
+                    "qty": 0,
+                    "price_unit": 0,
+                    "price_subtotal": 0,
+                    "price_subtotal_incl": 0,
+                }
+            )
+            self.write({"amount_total": 0.0, "amount_tax": 0.0})
+        vals = {"asign_state": "u"}
+        if self.name == "/":
+            vals["name"] = self._compute_order_name()
+        self.write(vals)
+
     def _asign_add_signature(self, limit=10):
         """Sign this order, including missed previous unsigned orders."""
         self.ensure_one()
@@ -322,11 +379,11 @@ class PosOrder(models.Model):
             unsigned_orders = self.search(
                 [
                     ("session_id.config_id", "=", self.session_id.config_id.id),
-                    ("asign_seq", ">", last_seq),
-                    ("asign_seq", "!=", False),
+                    ("sequence_number", ">", last_seq),
+                    ("state", "in", ("paid", "done", "cancel")),
                     ("asign_state", "!=", "s"),
                 ],
-                order="asign_seq ASC",
+                order="sequence_number ASC",
                 limit=limit,
             )
 
@@ -338,7 +395,7 @@ class PosOrder(models.Model):
                 )
                 return self.browse()
 
-            if unsigned_orders[0].asign_seq == last_seq + 1:
+            if unsigned_orders[0].sequence_number == last_seq + 1:
                 orders = unsigned_orders
             else:
                 _logger.error(
@@ -349,6 +406,7 @@ class PosOrder(models.Model):
                 )
                 return self.browse()
 
+        orders._compute_asign_seq()
         signed_orders = self.browse()
         for order in orders:
             if signed_orders and order.asign_seq != last_order.asign_seq + 1:
@@ -359,6 +417,9 @@ class PosOrder(models.Model):
                     order.name,
                 )
                 return signed_orders
+
+            if order.state == "cancel":
+                order._asign_prepare_cancel()
 
             try:
                 signature = order._asign_create_signature(last_order)
@@ -395,10 +456,12 @@ class PosOrder(models.Model):
 
     def _asign_sign_and_check_one(self):
         self.ensure_one()
-        if self.state not in ("paid", "done"):
+        # cancelled orders are accepted as well; they are prepared as zeroed
+        # receipts by _asign_prepare_cancel() inside the signing loop
+        if self.state not in ("paid", "done", "cancel"):
             raise UserError(
                 self.env._(
-                    "Order %s is not paid or done, cannot be signed",
+                    "Order %s is not paid, done or cancelled, cannot be signed",
                     self.name,
                 )
             )

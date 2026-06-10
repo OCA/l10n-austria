@@ -30,10 +30,19 @@
 - `pos.config.asign_key` – random 32-byte AES key (base64); CRC is the truncated SHA-256
   hash, also rendered on the configuration report.
 - `pos.order._asign_add_signature()` – core chained signing flow; called from
-  `action_pos_order_paid` and able to back-fill missed orders.
+  `action_pos_order_paid` and able to back-fill missed orders (paid, done and
+  cancelled ones).
+- `pos.order.write()` – guard that strips `state` (`draft`/`cancel`) and `name` (`'/'`)
+  changes on signed orders (lost-update race with concurrent cancel syncs) and logs
+  an error instead.
+- `pos.order._asign_prepare_cancel()` – prepares a cancelled order holding a receipt
+  number for signing: zeroes the lines when nothing was paid and restores the name.
 - `pos.config._asign_create_zero_receipt()` – produces start/zero receipts required by
   the RKSV (`asign_type` `s` for the very first one, `0` afterwards).
-- Cron `pos_config_ir_cron` – daily run of `_cron_asign_sign_missed`.
+- `pos.config._asign_repair_cancelled_names()` – restores names of signed orders that
+  were overwritten with `cancel`/`'/'`; runs idempotently inside `_asign_sign_missed`.
+- Cron `pos_config_ir_cron` – daily run of `_cron_asign_sign_missed`; also signs
+  cancelled orders as zeroed receipts to keep the receipt range gapless.
 
 ## Views & Menus
 
@@ -67,6 +76,7 @@ l10n_at_pos_rksv/
 ├── tests/
 │   ├── common.py          # local TestDownload / TestAsignCommon mixins
 │   ├── test_res_config_settings.py
+│   ├── test_cancel.py     # cancelled orders, write guard, name repair (mocked)
 │   ├── test_dep.py        # gated by `pos_config_id` config
 │   ├── test_asign_online.py # gated by `test_asign` config
 │   └── regcheck/          # Python wrapper + Java jars (tests-only)
@@ -76,6 +86,13 @@ l10n_at_pos_rksv/
 ## Known Pitfalls / Notes
 
 - License is **LGPL-3** to match the other OCA `l10n_at_*` modules.
+- In Odoo 19 every order consumes `sequence_number` at create. Cancelled orders
+  therefore hold a receipt number and must be signed as zeroed receipts (handled by
+  the signing loop / cron), otherwise the gapless receipt range breaks and all
+  following orders stay unsigned.
+- A concurrent cancel request can overwrite `state`/`name` of an order that is being
+  signed (row lock held during the external A-Trust call); the `write()` guard strips
+  those values for signed orders and logs an error.
 - `test_asign_online.py` and `test_dep.py` carry the `integration` / `-standard` tags
   and additionally check `config.get('test_asign')` / `config.get('pos_config_id')`.
   They are skipped in normal CI runs.
