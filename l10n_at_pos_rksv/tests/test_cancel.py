@@ -16,7 +16,7 @@ JWS_FAKE = "eyJhbGciOiJFUzI1NiJ9.cGF5bG9hZA.c2lnbmF0dXJl"
 
 
 class TestAsignCancel(TransactionCase, TestAsignCommonMixin):
-    """Cancelled orders holding a receipt number and the write guard."""
+    """Cancelled orders holding a receipt number."""
 
     def setUp(self):
         super().setUp()
@@ -164,31 +164,45 @@ class TestAsignCancel(TransactionCase, TestAsignCommonMixin):
         self.assertEqual(cancelled.amount_total, 0.0)
         self.assertEqual(cancelled.amount_tax, 0.0)
 
-    def test_write_guard(self):
-        """State and name of a signed order cannot be overwritten."""
-        order = self._create_signed_start_order()
-        name = order.name
+    def test_close_session_triggers_cron(self):
+        """Closing a session triggers the sign-missed cron."""
+        self._create_signed_start_order()
+        self._create_cancelled_order(2, 39.9)
 
-        with self.assertLogs(
-            "odoo.addons.l10n_at_pos_rksv.models.pos_order", level="ERROR"
-        ):
-            order.write(
-                {"state": "cancel", "name": "/", "pos_reference": "guard-test"}
-            )
+        cron = self.env.ref("l10n_at_pos_rksv.pos_config_ir_cron")
+        trigger_model = self.env["ir.cron.trigger"]
+        before = trigger_model.search_count([("cron_id", "=", cron.id)])
 
-        self.assertEqual(order.state, "paid")
-        self.assertEqual(order.name, name)
-        self.assertEqual(
-            order.pos_reference,
-            "guard-test",
-            "Unprotected values must still be written",
+        self.pos_session.set_opening_control(0, "")
+        with self._mock_sign():
+            self.pos_session.close_session_from_ui()
+
+        self.assertEqual(self.pos_session.state, "closed")
+        self.assertGreater(
+            trigger_model.search_count([("cron_id", "=", cron.id)]),
+            before,
+            "Closing the session must trigger the sign-missed cron",
         )
 
-        with self.assertLogs(
-            "odoo.addons.l10n_at_pos_rksv.models.pos_order", level="ERROR"
-        ):
-            order.write({"state": "draft"})
-        self.assertEqual(order.state, "paid")
+    def test_cron_skips_open_session(self):
+        """The cron skips POS with a session in opened state."""
+        self._create_signed_start_order()
+        cancelled = self._create_cancelled_order(2, 39.9)
+
+        self.pos_session.set_opening_control(0, "")
+        self.assertEqual(self.pos_session.state, "opened")
+
+        with self._mock_sign():
+            self.pos_config._cron_asign_sign_missed()
+        self.assertEqual(cancelled.asign_state, "u", "POS in use must be skipped")
+
+        with self._mock_sign():
+            self.pos_session.close_session_from_ui()
+            self.pos_config._cron_asign_sign_missed()
+
+        self.assertEqual(cancelled.asign_state, "s")
+        self.assertEqual(cancelled.asign_type, "0")
+        self.assertNotEqual(cancelled.name, "/")
 
     def test_repair_signed_cancelled_name(self):
         """The cron restores the name of an overwritten signed order."""

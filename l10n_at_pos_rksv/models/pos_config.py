@@ -438,6 +438,15 @@ class PosConfig(models.Model):
                     ("asign_state", "in", ["assigned", "active"]),
                 ]
             )
+        # only process POS that are not actively selling; signing missed
+        # orders of a POS in use is handled by its own payment flow
+        open_sessions = self.env["pos.session"].search(
+            [
+                ("config_id", "in", configs.ids),
+                ("state", "=", "opened"),
+            ]
+        )
+        configs -= open_sessions.config_id
         for config in configs:
             _logger.info("**RKSV** Check missed orders for POS %s", config.name)
             config._asign_sign_missed()

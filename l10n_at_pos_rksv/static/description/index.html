@@ -435,6 +435,13 @@ button on the POS configuration; printed with <tt class="docutils literal">NULLB
 <li><strong>Storno</strong> – cancellation of a previous receipt, printed with
 <tt class="docutils literal">STORNO</tt>.</li>
 </ul>
+<p>Cancelled orders consume a receipt number at creation. To keep the
+receipt range gapless, they are signed as zeroed receipts
+(<tt class="docutils literal">NULLBELEG</tt>); orders without any payment have their lines zeroed
+first. This signing runs right after a session is closed (triggered
+asynchronously) and additionally once a day via cron; a POS with an open
+session is skipped. Signed orders are protected against concurrent
+cancel requests overwriting their state or name.</p>
 <p>The list and form views of <em>Point of Sale &gt; Orders &gt; Orders</em> expose the
 RKSV fields (<tt class="docutils literal">a.sign Type</tt>, <tt class="docutils literal">a.sign State</tt>, <tt class="docutils literal">a.sign Sequence</tt>,
 <tt class="docutils literal">a.sign Counter</tt>, <tt class="docutils literal">a.sign DEP</tt>, <tt class="docutils literal">a.sign <span class="pre">QR-Code</span></tt>) for auditing and

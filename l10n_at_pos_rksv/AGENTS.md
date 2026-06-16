@@ -18,6 +18,7 @@
 | `asign.cert`          | A-Trust signing certificate plus online API credentials.                                                      |
 | `pos.config`          | Adds the RKSV configuration: enabled flag, method, serial, fiscal/POS-ID, encryption key, CRC, state machine. |
 | `pos.order`           | Adds RKSV fields and the chained signature implementation.                                                    |
+| `pos.session`         | Triggers the sign-missed cron after closing a session.                                                        |
 | `account.tax.group`   | Adds `asign_type` (RKSV tax category).                                                                        |
 | `res.config.settings` | Settings UI surface for `pos.config` RKSV fields.                                                             |
 
@@ -30,11 +31,8 @@
 - `pos.config.asign_key` – random 32-byte AES key (base64); CRC is the truncated SHA-256
   hash, also rendered on the configuration report.
 - `pos.order._asign_add_signature()` – core chained signing flow; called from
-  `action_pos_order_paid` and able to back-fill missed orders (paid, done and
-  cancelled ones).
-- `pos.order.write()` – guard that strips `state` (`draft`/`cancel`) and `name` (`'/'`)
-  changes on signed orders (lost-update race with concurrent cancel syncs) and logs
-  an error instead.
+  `action_pos_order_paid` and able to back-fill missed orders (paid, done and cancelled
+  ones).
 - `pos.order._asign_prepare_cancel()` – prepares a cancelled order holding a receipt
   number for signing: zeroes the lines when nothing was paid and restores the name.
 - `pos.config._asign_create_zero_receipt()` – produces start/zero receipts required by
@@ -42,7 +40,9 @@
 - `pos.config._asign_repair_cancelled_names()` – restores names of signed orders that
   were overwritten with `cancel`/`'/'`; runs idempotently inside `_asign_sign_missed`.
 - Cron `pos_config_ir_cron` – daily run of `_cron_asign_sign_missed`; also signs
-  cancelled orders as zeroed receipts to keep the receipt range gapless.
+  cancelled orders as zeroed receipts to keep the receipt range gapless. Skips POS with
+  a session in `opened` state; additionally triggered asynchronously by
+  `pos.session.action_pos_session_close()`.
 
 ## Views & Menus
 
@@ -69,7 +69,7 @@ l10n_at_pos_rksv/
 ├── i18n/de.po
 ├── models/
 │   ├── account_tax.py, asign.py, pos_config.py, pos_order.py,
-│   └── res_config_settings.py
+│   └── pos_session.py, res_config_settings.py
 ├── readme/                # OCA fragments (DESCRIPTION, USAGE, CONFIGURE…)
 ├── security/ir.model.access.csv
 ├── static/src/...         # POS frontend overrides + receipt CSS/QWeb
@@ -87,12 +87,9 @@ l10n_at_pos_rksv/
 
 - License is **LGPL-3** to match the other OCA `l10n_at_*` modules.
 - In Odoo 19 every order consumes `sequence_number` at create. Cancelled orders
-  therefore hold a receipt number and must be signed as zeroed receipts (handled by
-  the signing loop / cron), otherwise the gapless receipt range breaks and all
-  following orders stay unsigned.
-- A concurrent cancel request can overwrite `state`/`name` of an order that is being
-  signed (row lock held during the external A-Trust call); the `write()` guard strips
-  those values for signed orders and logs an error.
+  therefore hold a receipt number and must be signed as zeroed receipts (handled by the
+  signing loop / cron), otherwise the gapless receipt range breaks and all following
+  orders stay unsigned.
 - `test_asign_online.py` and `test_dep.py` carry the `integration` / `-standard` tags
   and additionally check `config.get('test_asign')` / `config.get('pos_config_id')`.
   They are skipped in normal CI runs.

@@ -138,39 +138,6 @@ class PosOrder(models.Model):
         ]
         return res
 
-    def write(self, vals):
-        # A concurrent cancel request (sync at session close, cancel from a
-        # second device, remove from kiosk) can read an order as draft while
-        # the payment transaction signs it and holds the row lock during the
-        # external A-Trust call. Its blocked write would then overwrite the
-        # state and name of the already signed order. Strip those values for
-        # signed orders instead of losing the receipt.
-        protected = {
-            key: vals[key]
-            for key, values in (("state", ("draft", "cancel")), ("name", ("/",)))
-            if vals.get(key) in values
-        }
-        if not protected:
-            return super().write(vals)
-
-        signed = self.filtered(lambda o: o.asign_state == "s" or o.asign_seq)
-        if not signed:
-            return super().write(vals)
-
-        _logger.error(
-            "**RKSV** Prevented overwrite of %s on signed orders %s",
-            protected,
-            signed.mapped("name"),
-        )
-        res = True
-        safe_vals = {k: v for k, v in vals.items() if k not in protected}
-        if safe_vals:
-            res = super(PosOrder, signed).write(safe_vals)
-        unsigned = self - signed
-        if unsigned:
-            res = super(PosOrder, unsigned).write(vals)
-        return res
-
     def _compute_order_name(self, session=None):
         if self.asign_state or self.config_id.asign_enabled:
             session = session or self.session_id

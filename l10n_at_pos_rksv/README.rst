@@ -85,6 +85,14 @@ the bottom of the receipt. Special receipts are produced when needed:
 - **Storno** – cancellation of a previous receipt, printed with
   ``STORNO``.
 
+Cancelled orders consume a receipt number at creation. To keep the
+receipt range gapless, they are signed as zeroed receipts
+(``NULLBELEG``); orders without any payment have their lines zeroed
+first. This signing runs right after a session is closed (triggered
+asynchronously) and additionally once a day via cron; a POS with an open
+session is skipped. Signed orders are protected against concurrent
+cancel requests overwriting their state or name.
+
 The list and form views of *Point of Sale > Orders > Orders* expose the
 RKSV fields (``a.sign Type``, ``a.sign State``, ``a.sign Sequence``,
 ``a.sign Counter``, ``a.sign DEP``, ``a.sign QR-Code``) for auditing and
