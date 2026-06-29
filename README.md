@@ -17,7 +17,11 @@ l10n-austria
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[l10n_at_pos_rksv](l10n_at_pos_rksv/) | 19.0.1.4.3 |  | Austrian RKSV (a.sign) integration for Point of Sale
 
 [//]: # (end addons)
 
