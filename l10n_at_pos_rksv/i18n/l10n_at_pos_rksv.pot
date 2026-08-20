@@ -4,13 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 07:57+0000\n"
-"PO-Revision-Date: 2026-07-04 07:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -19,12 +16,12 @@ msgstr ""
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "AES-256 Key"
-msgstr "AES-256 Schlüssel"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "AES-256 Key Checksum"
-msgstr "AES-256 Schlüssel Prüfsumme"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_certificate
@@ -35,7 +32,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__active
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_config__asign_state__active
 msgid "Active"
-msgstr "Aktiv"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_crc
@@ -45,37 +42,37 @@ msgstr ""
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_enabled
 msgid "Asign Enabled"
-msgstr "Asign Aktiviert"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_fid
 msgid "Asign Fid"
-msgstr "Asign Fid"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_key
 msgid "Asign Key"
-msgstr "Asign Schlüssel"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_method
 msgid "Asign Method"
-msgstr "Asign Methode"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_pid
 msgid "Asign Pid"
-msgstr "Asign Pid"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Assign"
-msgstr "Zuordnen"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_config__asign_state__assigned
 msgid "Assigned"
-msgstr "Zugeordnet"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
@@ -87,8 +84,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid ""
-"Austrian RKSV activated but encryption key has invalid length (%(length)s != "
-"%(expected)s) for POS %(name)s"
+"Austrian RKSV activated but encryption key has invalid length (%(length)s !="
+" %(expected)s) for POS %(name)s"
 msgstr ""
 
 #. module: l10n_at_pos_rksv
@@ -124,24 +121,24 @@ msgstr ""
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__c
 msgid "Cancel"
-msgstr "Storno"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__asign_cert__cert_type__card
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_config__asign_method__card
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__res_config_settings__asign_method__card
 msgid "Card"
-msgstr "Karte"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__cert_name
 msgid "Cert Name"
-msgstr "Zertikatsname"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__cert_type
 msgid "Cert Type"
-msgstr "Zertifikatstyp"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.actions.report,name:l10n_at_pos_rksv.certificate_report
@@ -150,38 +147,53 @@ msgstr "Zertifikatstyp"
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Certificate"
-msgstr "Zertifikat"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.asign_cert_view_search
 msgid "Certificate Type"
-msgstr "Zertifikatstyp"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_crc
 msgid "Checksum of the encryption key."
-msgstr "Checksumme für den Schlüssel."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.actions.act_window,help:l10n_at_pos_rksv.asign_cert_action
 msgid "Click on Create to add a new certificate."
-msgstr "Hier klicken um ein neues Zertifikat hinzuzufügen."
+msgstr ""
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model,name:l10n_at_pos_rksv.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.pos_config_view_form
 msgid "Create Zero-Receipt"
-msgstr "Erstelle einen Nullbeleg"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.actions.act_window,help:l10n_at_pos_rksv.asign_cert_action
 msgid "Create a new a.sign certificate."
-msgstr "Erstellen Sie ein neues a.sign Online-Zertifikat."
+msgstr ""
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_date
+msgid "Created on"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "Created zero-receipt was not signed."
-msgstr "Erstellter Nullbeleg wurde nicht signiert."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_account_tax_group__display_name
@@ -191,33 +203,33 @@ msgstr "Erstellter Nullbeleg wurde nicht signiert."
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_session__display_name
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__display_name
 msgid "Display Name"
-msgstr "Anzeigename"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_config__asign_state__draft
 msgid "Draft"
-msgstr "Entwurf"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_enabled
 msgid "Enable Austrian RKSV (a.sign) signing for this POS."
-msgstr "Aktivieren Sie das österreichische RKSV für POS."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Enable RKSV Austria"
-msgstr "RSKV für Österreich aktivieren"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Encryption Key"
-msgstr "Schlüssel"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Fiscal ID"
-msgstr "Fiskal-ID"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_pid
@@ -225,13 +237,11 @@ msgid ""
 "Fiscal ID of the POS system inside the company, used as prefix of the order "
 "number."
 msgstr ""
-"Fiskal-ID des Kassensystems innerhalb des Unternehmens und Präfix der "
-"Bestellnummer."
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.constraint,message:l10n_at_pos_rksv.constraint_pos_config_unique_asign_pid
 msgid "Fiscal POS-ID has to be unique for the company"
-msgstr "Fiskal-POS-ID muss für das Unternehmen eindeutig sein"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_account_tax_group__id
@@ -246,69 +256,69 @@ msgstr ""
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__write_uid
 msgid "Last Updated by"
-msgstr "Zuletzt aktualisiert von"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__write_date
 msgid "Last Updated on"
-msgstr "Zuletzt aktualisiert am"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Method"
-msgstr "Methode"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__m
 msgid "Mixed"
-msgstr "Gemischt"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-javascript
 #: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
 msgid "NULLBELEG"
-msgstr "NULLBELEG"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/asign.py:0
 msgid "No certificate found for serial %s"
-msgstr "Kein Zertifikat für Seriennummer %s gefunden"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__account_tax_group__asign_type__null
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__0
 msgid "Null"
-msgstr "Null"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__asign_cert__cert_type__online
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_config__asign_method__online
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__res_config_settings__asign_method__online
 msgid "Online"
-msgstr "Online"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_order.py:0
 msgid "Online RKSV signing error: %s"
-msgstr "Online RKSV Signaturfehler: %s"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_order.py:0
 msgid "Online RKSV signing has no result"
-msgstr "Online RKSV Signatur hat kein Ergebnis"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__o
 msgid "Order"
-msgstr "Auftrag"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
@@ -320,78 +330,77 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_order.py:0
 msgid "Order %s is not signed"
-msgstr "Auftrag %s ist nicht signiert"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "POS %s has a.sign disabled."
-msgstr "POS %s hat a.sign deaktiviert."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "POS %s has enabled a.sign but certificate is not assigned."
-msgstr "POS %s hat a.sign aktiviert, aber das Zertifikat ist nicht zugewiesen."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "POS %s has open sessions. Close them first."
-msgstr "POS %s hat offene Sitzungen. Schließen Sie diese zuerst."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.actions.report,name:l10n_at_pos_rksv.pos_config_report
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "POS Configuration"
-msgstr "POS Konfiguration"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "POS ID"
-msgstr "POS ID"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.actions.server,name:l10n_at_pos_rksv.pos_config_ir_cron_ir_actions_server
 msgid "POS a.sign: Sign Missed"
-msgstr "POS a.sign: Nachsignierung"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__password
 msgid "Password"
-msgstr "Passwort"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model,name:l10n_at_pos_rksv.model_pos_config
 msgid "Point of Sale Configuration"
-msgstr "Kassensystem-Konfiguration"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model,name:l10n_at_pos_rksv.model_pos_order
 msgid "Point of Sale Orders"
-msgstr "Kassenverkäufe"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model,name:l10n_at_pos_rksv.model_pos_session
-#, fuzzy
 msgid "Point of Sale Session"
-msgstr "Kassenverkäufe"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_certificate
 msgid "Provider"
-msgstr "Anbieter"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_asign_cert__cert
 msgid "Public certificate of the signing card or online service."
-msgstr "Zertifikat für das Kassensystem."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "QR Code"
-msgstr "QR Code"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_account_tax_group__asign_type
@@ -404,260 +413,256 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.view_pos_pos_form
 msgid "RKSV Austria"
-msgstr "RKSV Österreich"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "RKSV Configuration"
-msgstr "RKSV Konfiguration"
-
-#. module: l10n_at_pos_rksv
-#. odoo-javascript
-#: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
-msgid "Receipt No."
-msgstr "Belegnummer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__account_tax_group__asign_type__reduced1
 msgid "Reduced 1"
-msgstr "Ermäßigt 1"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__account_tax_group__asign_type__reduced2
 msgid "Reduced 2"
-msgstr "Ermäßigt 2"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Reset"
-msgstr "Zurücksetzen"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-javascript
 #: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
 msgid "STARTBELEG"
-msgstr "STARTBELEG"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-javascript
 #: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
 msgid "STORNO"
-msgstr "STORNO"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.asign_cert_view_search
 msgid "Search Certificate"
-msgstr "Suche Zertifikat"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_certificate
 msgid "Serial"
-msgstr "Seriennummer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__name
 msgid "Serial (Hex)"
-msgstr "Seriennummer (Hex)"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__serial_hex
 msgid "Serial (Normalized)"
-msgstr "Seriennummer (Normalisiert)"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.asign_cert_view_search
 msgid "Serial Number"
-msgstr "Seriennummer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.constraint,message:l10n_at_pos_rksv.constraint_asign_cert_unique_serial_hex
 msgid "Serial number has to be unique"
-msgstr "Seriennummer muss eindeutig sein"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_serial_hex
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_res_config_settings__asign_serial_hex
 msgid "Serial number of the certificate in hex format."
-msgstr "Seriennummer des Zertifikats im Hex-Format."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_asign_cert__serial_hex
 msgid "Serial number of the certificate in normalized hex format."
-msgstr "Seriennummer des Zertifikats im normalisierten Hex-Format."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.res_config_settings_view_form
 msgid "Serial#"
-msgstr "Seriennr."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__sign_qrcode
 msgid "Sign Qrcode"
-msgstr "Signatur QR-Code"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__sign_qrcode_name
 msgid "Sign Qrcode Name"
-msgstr "Signatur QR-Code Name"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_state__s
 msgid "Signed"
-msgstr "Signiert"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__account_tax_group__asign_type__special
 msgid "Special"
-msgstr "Spezial"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__s
 msgid "Start"
-msgstr "Start"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_start_order_id
 msgid "Start Order"
-msgstr "Startbeleg"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_pos_config
 msgid "Start Receipt"
-msgstr "Startbeleg"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_state
 msgid ""
-"State of the RKSV signature: unsigned means the signature is missing, signed "
-"means the signature is present. If empty, no signing is needed."
+"State of the RKSV signature: unsigned means the signature is missing, signed"
+" means the signature is present. If empty, no signing is needed."
 msgstr ""
-"Der Status der RKSV-Signatur. Nicht signiert bedeutet, dass die Signatur "
-"fehlt, signiert bedeutet, dass die Signatur vorhanden ist. Wenn nicht "
-"gesetzt, ist keine Signatur erforderlich."
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model,name:l10n_at_pos_rksv.model_account_tax_group
+msgid "Tax Group"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_key
 msgid "The AES encryption key of the journal."
-msgstr "Die AES-Verschlüsselungsschlüssel des Journals."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_dep
 msgid "The DEP entry of the RKSV signature export."
-msgstr "Der DEP des RKSV-Signatur-Exports."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_qrcode
 msgid "The QR code of the RKSV signature."
-msgstr "Der QR-Code der RKSV-Signatur."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-javascript
 #: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
 msgid "The receipt could not be signed and is therefore not valid!"
-msgstr "Der Beleg konnte nicht signiert werden und ist daher ungültig!"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_seq
 msgid "The sequence number of the RKSV signature export."
-msgstr "Die Sequenznummer des RKSV-Signatur-Exports."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_serial
 msgid "The serial number of the RKSV signing component."
-msgstr "Die Seriennummer des RKSV-Komponenten."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_order__asign_counter
 msgid "The turnover counter of the RKSV signature."
-msgstr "Der Umsatzzähler der RKSV-Signatur."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__t
 msgid "Training"
-msgstr "Training"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.report_certificate
 msgid "Type"
-msgstr "Typ"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_state__u
 msgid "Unsigned"
-msgstr "Nicht Signiert"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__user
 msgid "User"
-msgstr "Benutzer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_fid
 msgid "VAT or tax number of the company for the POS."
-msgstr "USt- oder Steuernummer des Unternehmens für die Kasse."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "Zero Receipt"
-msgstr "Nullbeleg"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model,name:l10n_at_pos_rksv.model_asign_cert
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.asign_cert_view_form
 msgid "a.sign Certificate"
-msgstr "a.sign Zertifikat"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.actions.act_window,name:l10n_at_pos_rksv.asign_cert_action
 #: model:ir.ui.menu,name:l10n_at_pos_rksv.asign_menu_act
 msgid "a.sign Certificate(s)"
-msgstr "a.sign Zertifikat(e)"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_crc
 msgid "a.sign Checksum"
-msgstr "a.sign Prüfsumme"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_counter
 msgid "a.sign Counter"
-msgstr "a.sign Zähler"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_dep
 msgid "a.sign DEP"
-msgstr "a.sign DEP"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_enabled
 msgid "a.sign Enabled"
-msgstr "a.sign Aktiviert"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_key
 msgid "a.sign Encryption Key"
-msgstr "a.sign Schlüssel"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_fid
 msgid "a.sign Fiscal ID"
-msgstr "a.sign Steuernummer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_method
 msgid "a.sign Method"
-msgstr "a.sign Methode"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_pid
 msgid "a.sign POS ID"
-msgstr "a.sign POS ID"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_qrcode
 msgid "a.sign QR-Code"
-msgstr "a.sign QR-Code"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_qrcode_quoted
@@ -667,30 +672,29 @@ msgstr ""
 #. module: l10n_at_pos_rksv
 #: model:ir.ui.menu,name:l10n_at_pos_rksv.asign_menu_categ
 msgid "a.sign RKSV"
-msgstr "a.sign RKSV"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
-#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_seq_id
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_seq
 msgid "a.sign Sequence"
-msgstr "a.sign Sequenz"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_serial_hex
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_serial
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_serial_hex
 msgid "a.sign Serial"
-msgstr "a.sign Seriennummer"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_state
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_state
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_res_config_settings__asign_state
 msgid "a.sign State"
-msgstr "a.sign Status"
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_account_tax_group__asign_type
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_type
 msgid "a.sign Type"
-msgstr "a.sign Typ"
+msgstr ""
