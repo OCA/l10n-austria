@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[l10n_at_pos_rksv](l10n_at_pos_rksv/) | 19.0.1.4.3 |  | Austrian RKSV (a.sign) integration for Point of Sale
+[l10n_at_pos_rksv](l10n_at_pos_rksv/) | 19.0.1.5.4 |  | Austrian RKSV (a.sign) integration for Point of Sale
 
 [//]: # (end addons)
 
