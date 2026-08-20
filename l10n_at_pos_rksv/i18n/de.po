@@ -168,6 +168,11 @@ msgid "Click on Create to add a new certificate."
 msgstr "Hier klicken um ein neues Zertifikat hinzuzufügen."
 
 #. module: l10n_at_pos_rksv
+#: model:ir.model,name:l10n_at_pos_rksv.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.pos_config_view_form
 msgid "Create Zero-Receipt"
 msgstr "Erstelle einen Nullbeleg"
@@ -178,10 +183,28 @@ msgid "Create a new a.sign certificate."
 msgstr "Erstellen Sie ein neues a.sign Online-Zertifikat."
 
 #. module: l10n_at_pos_rksv
+#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: l10n_at_pos_rksv
 #. odoo-python
 #: code:addons/l10n_at_pos_rksv/models/pos_config.py:0
 msgid "Created zero-receipt was not signed."
 msgstr "Erstellter Nullbeleg wurde nicht signiert."
+
+#. module: l10n_at_pos_rksv
+#: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_seq_id
+msgid ""
+"Dedicated gapless sequence for the RKSV receipt number (asign_seq). It is "
+"consumed only when a receipt is signed, so signed receipts stay consecutive "
+"regardless of cancelled orders."
+msgstr ""
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_account_tax_group__display_name
@@ -309,18 +332,6 @@ msgstr "Online RKSV Signatur hat kein Ergebnis"
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__pos_order__asign_type__o
 msgid "Order"
 msgstr "Auftrag"
-
-#. module: l10n_at_pos_rksv
-#. odoo-python
-#: code:addons/l10n_at_pos_rksv/models/pos_order.py:0
-msgid "Order %s is not paid, done or cancelled, cannot be signed"
-msgstr ""
-
-#. module: l10n_at_pos_rksv
-#. odoo-python
-#: code:addons/l10n_at_pos_rksv/models/pos_order.py:0
-msgid "Order %s is not signed"
-msgstr "Auftrag %s ist nicht signiert"
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
@@ -536,6 +547,11 @@ msgstr ""
 "gesetzt, ist keine Signatur erforderlich."
 
 #. module: l10n_at_pos_rksv
+#: model:ir.model,name:l10n_at_pos_rksv.model_account_tax_group
+msgid "Tax Group"
+msgstr ""
+
+#. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_key
 msgid "The AES encryption key of the journal."
 msgstr "Die AES-Verschlüsselungsschlüssel des Journals."
@@ -694,3 +710,6 @@ msgstr "a.sign Status"
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_type
 msgid "a.sign Type"
 msgstr "a.sign Typ"
+
+#~ msgid "Order %s is not signed"
+#~ msgstr "Auftrag %s ist nicht signiert"
