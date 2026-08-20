@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0\n"
+"Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-08 10:43+0000\n"
-"PO-Revision-Date: 2026-05-08 10:43+0000\n"
+"POT-Creation-Date: 2026-07-04 07:57+0000\n"
+"PO-Revision-Date: 2026-07-04 07:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: \n"
@@ -168,11 +168,6 @@ msgid "Click on Create to add a new certificate."
 msgstr "Hier klicken um ein neues Zertifikat hinzuzufügen."
 
 #. module: l10n_at_pos_rksv
-#: model:ir.model,name:l10n_at_pos_rksv.model_res_config_settings
-msgid "Config Settings"
-msgstr "Konfigurationseinstellungen"
-
-#. module: l10n_at_pos_rksv
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos_rksv.pos_config_view_form
 msgid "Create Zero-Receipt"
 msgstr "Erstelle einen Nullbeleg"
@@ -181,16 +176,6 @@ msgstr "Erstelle einen Nullbeleg"
 #: model_terms:ir.actions.act_window,help:l10n_at_pos_rksv.asign_cert_action
 msgid "Create a new a.sign certificate."
 msgstr "Erstellen Sie ein neues a.sign Online-Zertifikat."
-
-#. module: l10n_at_pos_rksv
-#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_uid
-msgid "Created by"
-msgstr "Erstellt von"
-
-#. module: l10n_at_pos_rksv
-#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_asign_cert__create_date
-msgid "Created on"
-msgstr "Erstellt am"
 
 #. module: l10n_at_pos_rksv
 #. odoo-python
@@ -427,6 +412,12 @@ msgid "RKSV Configuration"
 msgstr "RKSV Konfiguration"
 
 #. module: l10n_at_pos_rksv
+#. odoo-javascript
+#: code:addons/l10n_at_pos_rksv/static/src/overrides/order_receipt.xml:0
+msgid "Receipt No."
+msgstr "Belegnummer"
+
+#. module: l10n_at_pos_rksv
 #: model:ir.model.fields.selection,name:l10n_at_pos_rksv.selection__account_tax_group__asign_type__reduced1
 msgid "Reduced 1"
 msgstr "Ermäßigt 1"
@@ -543,11 +534,6 @@ msgstr ""
 "Der Status der RKSV-Signatur. Nicht signiert bedeutet, dass die Signatur "
 "fehlt, signiert bedeutet, dass die Signatur vorhanden ist. Wenn nicht "
 "gesetzt, ist keine Signatur erforderlich."
-
-#. module: l10n_at_pos_rksv
-#: model:ir.model,name:l10n_at_pos_rksv.model_account_tax_group
-msgid "Tax Group"
-msgstr "Steuergruppe"
 
 #. module: l10n_at_pos_rksv
 #: model:ir.model.fields,help:l10n_at_pos_rksv.field_pos_config__asign_key
@@ -684,6 +670,7 @@ msgid "a.sign RKSV"
 msgstr "a.sign RKSV"
 
 #. module: l10n_at_pos_rksv
+#: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_config__asign_seq_id
 #: model:ir.model.fields,field_description:l10n_at_pos_rksv.field_pos_order__asign_seq
 msgid "a.sign Sequence"
 msgstr "a.sign Sequenz"
