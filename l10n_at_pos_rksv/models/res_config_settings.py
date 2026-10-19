@@ -78,13 +78,11 @@ class ResConfigSettings(models.TransientModel):
 
                 if fiscal_pid:
                     update["asign_pid"] = fiscal_pid
-                    config.order_seq_id.implementation = "no_gap"
-                    config.order_seq_id.name = fiscal_pid.replace("/", "")
-                    config.order_seq_id.prefix = f"{fiscal_pid}/"
-                    config.order_seq_id.suffix = None
 
             if update:
                 config.write(update)
+                if update.get("asign_pid"):
+                    config._asign_order_seq()
 
     def action_asign_assign(self):
         self.ensure_one()

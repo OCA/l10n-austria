@@ -33,6 +33,10 @@
 - `pos.config.asign_seq_id` – dedicated `no_gap` `ir.sequence` per POS for the RKSV
   receipt number (`asign_seq`). Created at `action_asign_assign` (lazily via
   `_asign_seq`) and decoupled from the order number (`sequence_number`).
+- `pos.config._asign_order_seq()` – stamps the fiscal POS id on the **order** sequence
+  (`order_seq_id`): name, prefix `K02/` and `no_gap`. Called when the certificate is
+  assigned (`action_asign_assign`) and by the settings wizard after it wrote the POS id,
+  so every way to a fiscal id ends at the same place.
 - `pos.order.asign_seq` – gapless RKSV receipt number, drawn from `asign_seq_id` only
   when a receipt is signed (`_asign_next_seq`), so cancelled/skipped orders never create
   a gap.
@@ -126,6 +130,13 @@ l10n_at_pos_rksv/
   `ir.cron._trigger_list()` silently drops immediate triggers of inactive crons.
   `test_close_session_triggers_cron` therefore re-activates `pos_config_ir_cron` before
   asserting that closing a session creates a trigger.
+- A POS created by **copying** another one is a fresh POS: `asign_state`, `asign_pid`,
+  `asign_key`, `asign_crc` and `asign_seq_id` carry `copy=False`, and the core never
+  copies its `order_seq_id` either. The copy therefore gets a new POS id from
+  `_set_asign_defaults`, but its brand-new order sequence carries **no prefix** until
+  the certificate is assigned – that is why the prefix is written in
+  `_asign_order_seq()` and not only in the settings wizard. Writing it in the wizard
+  alone let copies sign receipts without any POS id.
 - `test_rksv_pid` deliberately provokes the per-company unique-index on
   `pos.config.asign_pid` and uses `@mute_logger("odoo.sql_db")` so the expected
   `UniqueViolation` does not leave an `ERROR` line in the log (which would otherwise

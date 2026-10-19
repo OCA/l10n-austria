@@ -145,7 +145,6 @@ class PosOrder(models.Model):
             "asign_state",
             "asign_qrcode",
             "asign_serial",
-            "asign_ref",
         ]
         return res
 

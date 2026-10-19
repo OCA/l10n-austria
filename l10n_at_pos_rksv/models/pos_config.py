@@ -139,6 +139,31 @@ class PosConfig(models.Model):
         for config in self:
             config.asign_start_order_id = config._get_asign_start_order()
 
+    def _asign_order_seq(self):
+        """Point the POS order sequence at the fiscal id of this POS.
+
+        The receipt number is built from the order sequence, so its prefix
+        carries the fiscal POS id (``K02/``). It is set here and not on the
+        sequence itself, because a POS reaches its fiscal id on several ways:
+        typed into the settings, defaulted by ``_set_asign_defaults`` or
+        copied from another POS. The sequence itself is never copied - a new
+        POS always gets a fresh one from the core - so it has to be stamped
+        when the certificate is assigned.
+        """
+        self.ensure_one()
+        fiscal_pid = re.sub(r"[^0-9A-Za-z]", "", self.asign_pid or "")
+        if not fiscal_pid or not self.order_seq_id:
+            return self.env["ir.sequence"]
+        self.order_seq_id.sudo().write(
+            {
+                "implementation": "no_gap",
+                "name": fiscal_pid,
+                "prefix": f"{fiscal_pid}/",
+                "suffix": None,
+            }
+        )
+        return self.order_seq_id
+
     def _asign_seq(self):
         """Return the dedicated gapless RKSV receipt sequence, creating it once.
 
@@ -263,6 +288,7 @@ class PosConfig(models.Model):
         configs.write({"asign_state": "assigned"})
         for config in configs:
             config._asign_seq()
+            config._asign_order_seq()
 
     def action_asign_reset(self):
         configs = self.filtered(

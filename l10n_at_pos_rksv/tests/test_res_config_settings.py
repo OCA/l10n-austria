@@ -47,6 +47,47 @@ class TestRksvConfig(TransactionCase):
             pos_config2.write({"asign_pid": "K01"})
             self.env.flush_all()
 
+    def test_rksv_copy_signs_under_its_own_pos_id(self):
+        """A copied POS gets its own order sequence, stamped when assigned.
+
+        The sequences themselves are never copied - the core hands every new
+        POS fresh ones - but their prefix carries the fiscal POS id, and that
+        was only written by the settings wizard. A POS created by copying
+        therefore used to sign receipts without any POS id.
+        """
+        self.env["pos.config"].search([]).write(
+            {"asign_enabled": False, "asign_pid": None}
+        )
+
+        source = self.env["pos.config"].create(
+            {
+                "name": "Test Config1",
+                "module_pos_restaurant": False,
+                "asign_serial_hex": "a",
+                "asign_enabled": True,
+                "asign_fid": "AT1234567890",
+            }
+        )
+        source.action_asign_assign()
+        self.assertEqual(source.order_seq_id.prefix, "K01/")
+
+        copied = source.copy()
+        self.assertEqual(copied.asign_pid, "K02")
+        self.assertEqual(copied.asign_state, "draft")
+        self.assertFalse(
+            copied.asign_seq_id, "receipt sequence comes with the assignment"
+        )
+        self.assertNotEqual(copied.order_seq_id, source.order_seq_id)
+
+        copied.action_asign_assign()
+        self.assertEqual(copied.order_seq_id.name, "K02")
+        self.assertEqual(copied.order_seq_id.prefix, "K02/")
+        self.assertEqual(copied.order_seq_id.implementation, "no_gap")
+        self.assertFalse(copied.order_seq_id.suffix)
+        self.assertTrue(copied.asign_seq_id)
+        self.assertNotEqual(copied.asign_seq_id, source.asign_seq_id)
+        self.assertEqual(source.order_seq_id.prefix, "K01/", "source stays untouched")
+
     def test_rksv_setting_online(self):
         """Settings wizard exposes RKSV fields and updates the POS config."""
         pos_config1 = self.env["pos.config"].create(

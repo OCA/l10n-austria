@@ -1,0 +1,26 @@
+/* Copyright 2024 Weboffice IT-Service und Marketing GmbH & Co KG <https://weboffice.at>
+   License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). */
+
+/* RKSV block: QR on the left, receipt data on the right */
+.pos-receipt .oj-rksv-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+}
+.pos-receipt .oj-rksv-block .pos-receipt-qrcode {
+    /* 5% above the 150px base; may shrink on 58mm paper, the receipt
+       data keep at least half of the width */
+    width: 158px;
+    height: auto;
+    max-width: 45%;
+    flex: 0 1 auto;
+    margin: 0;
+}
+.pos-receipt .oj-rksv-block .oj-rksv-data {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.pos-receipt .oj-rksv-block .pos-receipt-qrcode-text {
+    text-align: left;
+}

@@ -15,31 +15,43 @@
                 </t>
                 <t t-elif="order.asign_state == 's'">
                     <br />
-                    <img
-                        id="asign_qrcode"
-                        t-att-src="asignQrCode"
-                        class="pos-receipt-qrcode"
-                    />
-                    <div class="pos-receipt-qrcode-text">
-                        <t t-esc="order.config.asign_pid" />:
-                        <t t-esc="order.asign_serial" />
+                    <!-- QR on the left, receipt data on the right; the QR may
+                         shrink to 45% of the paper width so the two columns
+                         also fit 58mm paper (see order_receipt.css) -->
+                    <div class="oj-rksv-block">
+                        <img
+                            id="asign_qrcode"
+                            t-att-src="asignQrCode"
+                            class="pos-receipt-qrcode"
+                        />
+                        <div class="oj-rksv-data">
+                            <!-- RKSV is Austrian law, the wording is German
+                                 on purpose, like NULLBELEG/STORNO below -->
+                            <div
+                                class="pos-receipt-qrcode-text fw-bolder"
+                            >RKSV Daten</div>
+                            <div class="pos-receipt-qrcode-text">
+                                <t t-esc="order.config.asign_pid" />:
+                                <t t-esc="order.asign_serial" />
+                            </div>
+                            <div class="pos-receipt-qrcode-text">Receipt No.</div>
+                            <div class="pos-receipt-qrcode-text">
+                                <t t-esc="order.name" />
+                            </div>
+                            <div
+                                t-if="order.asign_type == '0'"
+                                class="pos-receipt-qrcode-text"
+                            >NULLBELEG</div>
+                            <div
+                                t-if="order.asign_type == 's'"
+                                class="pos-receipt-qrcode-text"
+                            >STARTBELEG</div>
+                            <div
+                                t-if="order.asign_type == 'c'"
+                                class="pos-receipt-qrcode-text"
+                            >STORNO</div>
+                        </div>
                     </div>
-                    <div class="pos-receipt-qrcode-text">Receipt No.</div>
-                    <div class="pos-receipt-qrcode-text">
-                        <t t-esc="order.name" />
-                    </div>
-                    <div
-                        t-if="order.asign_type == '0'"
-                        class="pos-receipt-qrcode-text"
-                    >NULLBELEG</div>
-                    <div
-                        t-if="order.asign_type == 's'"
-                        class="pos-receipt-qrcode-text"
-                    >STARTBELEG</div>
-                    <div
-                        t-if="order.asign_type == 'c'"
-                        class="pos-receipt-qrcode-text"
-                    >STORNO</div>
                 </t>
             </t>
         </xpath>
