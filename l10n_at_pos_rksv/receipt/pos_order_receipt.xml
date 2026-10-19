@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2024 Weboffice IT-Service und Marketing GmbH & Co KG <https://weboffice.at>
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <!-- Rendered on the server and in the POS, the data come from
+         receipt/pos_order_receipt.py and its JS copy -->
+    <template id="pos_order_receipt" inherit_id="point_of_sale.pos_order_receipt">
+        <div name="before-footer" position="inside">
+            <div
+                t-if="conditions.get('l10n_at_pos_rksv')"
+                class="w-100 mt-3"
+                name="l10n_at_pos_rksv"
+            >
+                <div t-if="order['asign_state'] == 'u'" class="text-center text-bold">
+                    The receipt could not be signed and is therefore not valid!
+                </div>
+                <!-- QR on the left, receipt data on the right; a table keeps
+                     the two columns in wkhtmltoimage as well -->
+                <table t-elif="order['asign_state'] == 's'" class="w-100">
+                    <tr>
+                        <td class="top" style="width: 170px;">
+                            <img
+                                t-if="image.get('asign_qr_code')"
+                                t-att-src="image['asign_qr_code']"
+                                alt="RKSV QR Code"
+                                style="width: 158px;"
+                            />
+                        </td>
+                        <td class="top text-start text-break ps-3">
+                            <!-- RKSV is Austrian law, the wording is German
+                                 on purpose, like NULLBELEG/STORNO below -->
+                            <div class="text-bold">RKSV Daten</div>
+                            <div>
+                                <t t-out="config['asign_pid']" />:
+                                <t t-out="order['asign_serial']" />
+                            </div>
+                            <div>Receipt No.</div>
+                            <div t-out="order['name']" />
+                            <div t-if="order['asign_type'] == '0'">NULLBELEG</div>
+                            <div t-if="order['asign_type'] == 's'">STARTBELEG</div>
+                            <div t-if="order['asign_type'] == 'c'">STORNO</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </template>
+</odoo>
