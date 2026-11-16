@@ -3,13 +3,18 @@
 
 import base64
 import hashlib
+import json
 import logging
 import re
 import secrets
 import uuid
 
+import pytz
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+
+from .pos_order import TIMEZONE_AT, asign_b64urldecode_nopadding
 
 _logger = logging.getLogger(__name__)
 
@@ -331,8 +336,15 @@ class PosConfig(models.Model):
         self._check_asign_before_creating_new_session()
         return res
 
-    def _asign_create_zero_receipt(self):
+    def _asign_create_zero_receipt(self, receipt_type="0"):
+        """Create and sign a zero receipt of ``receipt_type``.
+
+        ``"0"`` is the zero receipt (the very first receipt of a POS becomes the
+        start receipt), ``"month"`` the Monatsbeleg (RKSV par. 8).
+        """
         self.ensure_one()
+        if receipt_type not in ("0", "month"):
+            raise UserError(self.env._("Unknown receipt type %s.", receipt_type))
 
         if self.has_active_session:
             raise UserError(
@@ -361,9 +373,11 @@ class PosConfig(models.Model):
             }
         )
 
-        session.set_opening_control(
-            cash_register_balance_start, self.env._("Zero Receipt")
-        )
+        labels = {
+            "0": self.env._("Zero Receipt"),
+            "month": self.env._("Month Receipt"),
+        }
+        session.set_opening_control(cash_register_balance_start, labels[receipt_type])
         session.cash_register_balance_end_real = cash_register_balance_end_real
 
         date_order = fields.Datetime.to_string(fields.Datetime.now())
@@ -377,7 +391,7 @@ class PosConfig(models.Model):
             "to_invoice": False,
             "shipping_date": None,
             "asign_state": "u",
-            "asign_type": "0",
+            "asign_type": receipt_type,
             "session_id": session.id,
             "user_id": self.env.uid,
             "amount_paid": 0.0,
@@ -394,7 +408,123 @@ class PosConfig(models.Model):
         zero_order.ensure_one()
         if zero_order.asign_state != "s":
             raise ValidationError(self.env._("Created zero-receipt was not signed."))
+        if zero_order.asign_type == "s" or self._asign_is_year_receipt(zero_order):
+            self._asign_check_receipt(zero_order)
         return zero_order
+
+    @api.model
+    def _asign_is_year_receipt(self, order):
+        """Return whether ``order`` is the Jahresbeleg.
+
+        The Jahresbeleg is the month receipt of December, created right after
+        the month ended, so its Austrian date is in January.
+        """
+        if order.asign_type != "month":
+            return False
+        local = pytz.utc.localize(order.date_order).astimezone(TIMEZONE_AT)
+        return local.month == 1
+
+    def _asign_check_receipt(self, order):
+        """Check that a start/Jahresbeleg is signed and its JWS is well formed.
+
+        This is NOT the full check of RKSV par. 6 para. 4: the turnover counter
+        is not decrypted and compared. Only the structure is checked (signed,
+        three JWS parts, decodable header/signature, signature equals the one in
+        the QR code). The cryptographic verification against the certificate is
+        done by the DEP check (tests/regcheck).
+        On failure a warning is logged and posted on the receipt's chatter
+        (``pos.config`` itself has no chatter). Returns whether the receipt is ok.
+        """
+        self.ensure_one()
+        error = None
+        if order.asign_state != "s":
+            error = self.env._("receipt is not signed")
+        else:
+            try:
+                header, _payload, signature = order.asign_dep.split(".")
+                asign_b64urldecode_nopadding(header)
+                sig = base64.b64encode(asign_b64urldecode_nopadding(signature))
+                if not order.asign_qrcode.endswith("_" + sig.decode()):
+                    error = self.env._("signature does not match QR code")
+            except ValueError:
+                error = self.env._("malformed JWS")
+        if error:
+            _logger.warning(
+                "**RKSV** check of %s receipt %s failed for POS %s: %s",
+                order.asign_type,
+                order.name,
+                self.name,
+                error,
+            )
+            order.message_post(body=self.env._("RKSV receipt check failed: %s", error))
+        return not error
+
+    def _asign_month_receipt(self, month_start):
+        """Create the receipt for the month that ended at ``month_start``.
+
+        Skipped while a session is open, without start receipt before
+        ``month_start`` (no month ended yet) or if a month receipt exists since
+        ``month_start`` (idempotent per ended month).
+        """
+        self.ensure_one()
+        if self.has_active_session:
+            _logger.warning(
+                "**RKSV** month receipt skipped, POS %s has open sessions", self.name
+            )
+            return False
+        start_order = self._get_asign_start_order()
+        if not start_order or start_order.date_order >= month_start:
+            _logger.info(
+                "**RKSV** month receipt skipped, POS %s has no ended month", self.name
+            )
+            return False
+        existing = self.env["pos.order"].search_count(
+            [
+                ("config_id", "=", self.id),
+                ("asign_type", "=", "month"),
+                ("date_order", ">=", month_start),
+            ]
+        )
+        if existing:
+            return False
+        return self._asign_create_zero_receipt("month")
+
+    @api.model
+    def _asign_month_start(self, now=None):
+        """Return the start of the current month in Austrian time.
+
+        The result is a naive UTC datetime, comparable with ``date_order``.
+        ``now`` is a naive UTC datetime (default: current time).
+        """
+        now = pytz.utc.localize(now or fields.Datetime.now())
+        local = now.astimezone(TIMEZONE_AT)
+        # localize() picks the UTC offset valid on the 1st (DST), replace() would not
+        start = TIMEZONE_AT.localize(
+            local.replace(tzinfo=None, day=1, hour=0, minute=0, second=0, microsecond=0)
+        )
+        return start.astimezone(pytz.utc).replace(tzinfo=None)
+
+    def _cron_asign_month_receipt(self):
+        """Create the Monatsbeleg of the month that just ended (RKSV par. 8).
+
+        Runs daily; the first run in a new month creates the receipt, later runs
+        find it and skip.
+        """
+        configs = self or self.search(
+            [
+                ("asign_enabled", "=", True),
+                ("asign_state", "in", ["assigned", "active"]),
+            ]
+        )
+        month_start = self._asign_month_start()
+        for config in configs:
+            try:
+                with self.env.cr.savepoint():
+                    config._asign_month_receipt(month_start)
+            except (UserError, ValidationError):
+                _logger.exception(
+                    "**RKSV** month receipt failed for POS %s", config.name
+                )
 
     def _asign_repair_signed_names(self):
         """Restore names of signed receipts overwritten by a concurrent cancel.
@@ -477,3 +607,27 @@ class PosConfig(models.Model):
 
     def action_asign_zero_receipt(self):
         self._asign_create_zero_receipt()
+
+    def action_asign_dep_export(self):
+        """Download the DEP export (JSON) of this POS.
+
+        The attachment belongs to the user only (no res_model/res_id) and older
+        exports of this POS by the same user are removed first.
+        """
+        self.ensure_one()
+        name = f"dep-{self.asign_pid or self.id}.json"
+        self.env["ir.attachment"].search(
+            [("name", "=", name), ("create_uid", "=", self.env.uid)]
+        ).unlink()
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": name,
+                "raw": json.dumps(self._asign_dep_export(), indent=2).encode(),
+                "mimetype": "application/json",
+            }
+        )
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{attachment.id}?download=true",
+            "target": "self",
+        }

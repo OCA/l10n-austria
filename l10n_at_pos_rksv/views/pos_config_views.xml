@@ -15,6 +15,12 @@
                         type="object"
                         invisible="not asign_enabled"
                     />
+                    <button
+                        name="action_asign_dep_export"
+                        string="Export DEP"
+                        type="object"
+                        invisible="not asign_enabled"
+                    />
                 </header>
             </sheet>
         </field>

@@ -37,6 +37,14 @@
                         class="pos-receipt-qrcode-text"
                     >STARTBELEG</div>
                     <div
+                        t-if="order.asign_type == 'month'"
+                        class="pos-receipt-qrcode-text"
+                    >MONATSBELEG</div>
+                    <div
+                        t-if="order.asign_type == 'month' and order.date_order.setZone('Europe/Vienna').month == 1"
+                        class="pos-receipt-qrcode-text"
+                    >JAHRESBELEG</div>
+                    <div
                         t-if="order.asign_type == 'c'"
                         class="pos-receipt-qrcode-text"
                     >STORNO</div>

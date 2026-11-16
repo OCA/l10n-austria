@@ -65,6 +65,7 @@ class PosOrder(models.Model):
             ("c", "Cancel"),
             ("m", "Mixed"),
             ("t", "Training"),
+            ("month", "Month"),
         ],
         string="a.sign Type",
         index=True,
@@ -245,7 +246,8 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             if not amounts["amount"]:
-                asign_type = "0"
+                # Month receipts are zero receipts that keep their type.
+                asign_type = "month" if self.asign_type == "month" else "0"
                 if not last_order:
                     asign_type = "s"
 
