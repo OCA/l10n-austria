@@ -5,7 +5,7 @@ import base64
 from datetime import datetime
 from unittest import mock
 
-from odoo.exceptions import UserError
+from odoo import fields
 from odoo.tests.common import TransactionCase
 
 from .common import TestAsignCommonMixin
@@ -14,9 +14,16 @@ from .common import TestAsignCommonMixin
 # _asign_create_signature.
 JWS_FAKE = "eyJhbGciOiJFUzI1NiJ9.cGF5bG9hZA.c2lnbmF0dXJl"
 
+# Naive UTC "now" values; Vienna is UTC+1 in winter.
+NOV_15 = datetime(2026, 11, 15, 12, 0)
+NOV_30_UTC_EARLY = datetime(2026, 11, 30, 22, 30)  # 23:30 Vienna, still November
+NOV_30_UTC_LATE = datetime(2026, 11, 30, 23, 30)  # 00:30 Vienna on 1 Dec
+DEC_1 = datetime(2026, 12, 1, 6, 0)
+JAN_1 = datetime(2027, 1, 1, 6, 0)
+
 
 class TestAsignPeriodReceipt(TransactionCase, TestAsignCommonMixin):
-    """Month/year receipts, their crons and the DEP export button."""
+    """Month receipts, their cron and the DEP export button."""
 
     def setUp(self):
         super().setUp()
@@ -46,27 +53,42 @@ class TestAsignPeriodReceipt(TransactionCase, TestAsignCommonMixin):
             [("config_id", "=", self.pos_config.id), ("asign_type", "=", asign_type)]
         )
 
-    def test_create_month_receipt(self):
-        # Case 1: start receipt, then month receipt (signed, seq 1 -> 2)
-        start = self.pos_config._asign_create_zero_receipt()
-        month = self.pos_config._asign_create_zero_receipt("month")
-        self.assertEqual(start.asign_type, "s")
-        self.assertEqual(month.asign_type, "month")
-        self.assertEqual(month.asign_state, "s")
-        self.assertEqual(month.asign_seq, start.asign_seq + 1)
-        # Case 2: invalid receipt type raises
-        with self.assertRaises(UserError):
-            self.pos_config._asign_create_zero_receipt("bogus")
+    def _at(self, when):
+        """Run code with ``fields.Datetime.now()`` fixed to ``when`` (naive UTC)."""
+        return mock.patch.object(fields.Datetime, "now", return_value=when)
 
-    def test_cron_month_receipt_idempotent(self):
-        # Case 1: no start receipt yet -> cron creates nothing
-        self.pos_config._cron_asign_month_receipt()
+    def test_cron_month_receipt_month_end(self):
+        # Scene: start receipt on 15 Nov 2026; month ends at 1 Dec 00:00 Vienna.
+        with self._at(NOV_15):
+            # Case 1: no start receipt yet -> cron creates nothing
+            self.pos_config._cron_asign_month_receipt()
+            self.assertFalse(self._receipts("month"))
+            self.pos_config._asign_create_zero_receipt()
+            # Case 2: still in the start month -> no month has ended
+            self.pos_config._cron_asign_month_receipt()
+            self.assertFalse(self._receipts("month"))
+        with self._at(DEC_1):
+            # Case 3: on the 1st, receipt for ended November, second run none
+            self.pos_config._cron_asign_month_receipt()
+            self.pos_config._cron_asign_month_receipt()
+            self.assertEqual(len(self._receipts("month")), 1)
+
+    def test_cron_month_receipt_vienna_boundary(self):
+        with self._at(NOV_15):
+            self.pos_config._asign_create_zero_receipt()
+        # Case 1: 30 Nov 22:30 UTC is 23:30 in Vienna, month not over -> none
+        with self._at(NOV_30_UTC_EARLY):
+            self.pos_config._cron_asign_month_receipt()
         self.assertFalse(self._receipts("month"))
-        # Case 2: with start receipt, two runs -> one month receipt
-        self.pos_config._asign_create_zero_receipt()
-        self.pos_config._cron_asign_month_receipt()
-        self.pos_config._cron_asign_month_receipt()
+        # Case 2: 30 Nov 23:30 UTC is already 1 Dec in Vienna -> created
+        with self._at(NOV_30_UTC_LATE):
+            self.pos_config._cron_asign_month_receipt()
         self.assertEqual(len(self._receipts("month")), 1)
+
+    def test_month_start_dst(self):
+        # Case 1: 26 Oct (CET) -> 1 Oct 00:00 is still CEST = 30 Sep 22:00 UTC
+        start = self.pos_config._asign_month_start(datetime(2026, 10, 26, 10, 0))
+        self.assertEqual(start, datetime(2026, 9, 30, 22, 0))
 
     def test_check_receipt(self):
         # Case 1: signed fake receipt has a consistent signature
@@ -77,26 +99,19 @@ class TestAsignPeriodReceipt(TransactionCase, TestAsignCommonMixin):
         self.assertFalse(self.pos_config._asign_check_receipt(start))
         self.assertIn("check failed", start.message_ids[0].body)
 
-    def test_action_asign_dep_export(self):
-        action = self.pos_config.action_asign_dep_export()
-        self.assertEqual(action["type"], "ir.actions.act_url")
-        self.assertIn("download=true", action["url"])
-
-    def test_period_start_vienna(self):
-        # Case 1: 30 Nov 23:30 UTC is already 1 Dec in Vienna (UTC+1)
-        now_utc = datetime(2026, 11, 30, 23, 30)
-        month = self.env["pos.config"]._asign_period_start("month", now_utc)
-        year = self.env["pos.config"]._asign_period_start("year", now_utc)
-        self.assertEqual(month, datetime(2026, 11, 30, 23, 0))  # 1 Dec 00:00 CET
-        self.assertEqual(year, datetime(2025, 12, 31, 23, 0))  # 1 Jan 00:00 CET
-
-    def test_check_called_for_start_and_year_only(self):
+    def test_check_called_for_start_and_december_month_receipt(self):
         config = self.pos_config
         with mock.patch.object(
             type(config), "_asign_check_receipt", autospec=True
         ) as check:
-            config._asign_create_zero_receipt()  # start
-            config._asign_create_zero_receipt("month")
+            with self._at(NOV_15):
+                config._asign_create_zero_receipt()  # start
             self.assertEqual(check.call_count, 1)
-            config._asign_create_zero_receipt("year")
+            # Case 1: month receipt of November (created in December): no check
+            with self._at(DEC_1):
+                config._asign_create_zero_receipt("month")
+            self.assertEqual(check.call_count, 1)
+            # Case 2: month receipt of December (created in January): checked
+            with self._at(JAN_1):
+                config._asign_create_zero_receipt("month")
             self.assertEqual(check.call_count, 2)

@@ -51,14 +51,19 @@
   when paid.
 - `pos.config._asign_create_zero_receipt(receipt_type="0")` – produces start/zero
   receipts required by the RKSV (`asign_type` `s` for the very first one, `0`
-  afterwards); `receipt_type` `month` / `year` creates the periodic month/year receipt
-  (`asign_type` `month` / `year`, signed as zero receipts). Start and year receipts are
-  checked by `_asign_check_receipt()` (signed, JWS well formed and equal to the QR
-  signature; failure is logged and posted on the receipt chatter; structure check only).
-- Crons `pos_config_ir_cron_month_receipt` / `_year_receipt` – call
-  `_cron_asign_month_receipt` / `_cron_asign_year_receipt` for all active POS; skip POS
-  with an open session or without start receipt, and POS that already have a receipt of
-  that type in the current month/year. Verify legal deadlines against bmf.gv.at.
+  afterwards); `receipt_type` `month` creates the Monatsbeleg (`asign_type` `month`,
+  signed as zero receipt). The Jahresbeleg is the December Monatsbeleg (Austrian
+  `date_order` in January, `_asign_is_year_receipt`), not an extra receipt; the receipt
+  template prints it as `JAHRESBELEG`. Start receipt and Jahresbeleg are checked by
+  `_asign_check_receipt()` (signed, JWS well formed and equal to the QR signature;
+  failure is logged and posted on the receipt chatter). It is a structure check only,
+  NOT the full RKSV par. 6 para. 4 check (turnover counter is not decrypted).
+- Cron `pos_config_ir_cron_month_receipt` – calls `_cron_asign_month_receipt` daily for
+  all active POS; creates the receipt of the month that just ended (RKSV par. 8) on the
+  first run of the new month. Skips POS with an open session, whose start receipt is in
+  the current month, or that already have a month receipt since the current month began
+  (Europe/Vienna). Limits: only the last ended month is created (missed months are
+  not back-filled); a skipped POS is retried on the next run, with a later counter.
 - `pos.config.action_asign_dep_export()` – downloads `_asign_dep_export()` as JSON
   attachment (button _Export DEP_).
 - `pos.config._asign_repair_signed_names()` – restores names of already signed receipts

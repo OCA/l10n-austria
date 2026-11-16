@@ -6,11 +6,17 @@ receipt. Special receipts are produced when needed:
   marker `STARTBELEG` on the printed receipt.
 - **Nullbeleg** – manually triggered via the *Create Zero-Receipt* button on
   the POS configuration; printed with `NULLBELEG`.
-- **Monatsbeleg / Jahresbeleg** – created by two crons (once per month / year)
-  for every active POS without an open session and printed with `MONATSBELEG` /
-  `JAHRESBELEG`. Start and year receipts are checked automatically after
-  creation. Verify the legal deadlines on bmf.gv.at and adjust the schedule of
-  the cron records accordingly.
+- **Monatsbeleg / Jahresbeleg** – RKSV par. 8: a daily cron creates the signed
+  zero receipt for every month end, i.e. on the first run of the new month, for
+  every active POS without an open session (not in the month of the start
+  receipt). It is printed with `MONATSBELEG`. Limits: only the last ended month is
+  created, missed months are not back-filled; a POS whose session is open at the
+  time of the cron run is skipped until the next run. The Monatsbeleg of December (created
+  in January) is the Jahresbeleg and is additionally printed with `JAHRESBELEG`;
+  there is no separate year receipt. Start receipt and Jahresbeleg are checked
+  automatically after creation. This is only a structure check of the signature
+  (JWS well formed, equal to the QR code); it is NOT the full check of RKSV par. 6
+  para. 4, the turnover counter is not decrypted.
 - **Storno** – cancellation of a previous receipt, printed with `STORNO`.
 
 Cancelled orders consume a receipt number at creation. To keep the receipt
