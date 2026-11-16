@@ -6,6 +6,11 @@ receipt. Special receipts are produced when needed:
   marker `STARTBELEG` on the printed receipt.
 - **Nullbeleg** – manually triggered via the *Create Zero-Receipt* button on
   the POS configuration; printed with `NULLBELEG`.
+- **Monatsbeleg / Jahresbeleg** – created by two crons (once per month / year)
+  for every active POS without an open session and printed with `MONATSBELEG` /
+  `JAHRESBELEG`. Start and year receipts are checked automatically after
+  creation. Verify the legal deadlines on bmf.gv.at and adjust the schedule of
+  the cron records accordingly.
 - **Storno** – cancellation of a previous receipt, printed with `STORNO`.
 
 Cancelled orders consume a receipt number at creation. To keep the receipt
@@ -18,6 +23,9 @@ protected against concurrent cancel requests overwriting their state or name.
 The list and form views of *Point of Sale > Orders > Orders* expose the RKSV
 fields (`a.sign Type`, `a.sign State`, `a.sign Sequence`, `a.sign Counter`,
 `a.sign DEP`, `a.sign QR-Code`) for auditing and exporting the DEP.
+
+The *Export DEP* button on the POS configuration downloads the DEP of the POS
+as JSON file.
 
 Printable PDF reports are available for the certificate and the POS
 configuration via the *Print* menu of the corresponding form.

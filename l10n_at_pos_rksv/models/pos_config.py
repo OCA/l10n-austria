@@ -3,13 +3,18 @@
 
 import base64
 import hashlib
+import json
 import logging
 import re
 import secrets
 import uuid
 
+import pytz
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+
+from .pos_order import PERIOD_TYPES, TIMEZONE_AT, asign_b64urldecode_nopadding
 
 _logger = logging.getLogger(__name__)
 
@@ -331,8 +336,15 @@ class PosConfig(models.Model):
         self._check_asign_before_creating_new_session()
         return res
 
-    def _asign_create_zero_receipt(self):
+    def _asign_create_zero_receipt(self, receipt_type="0"):
+        """Create and sign a zero receipt of ``receipt_type``.
+
+        ``"0"`` is the zero receipt (the very first receipt of a POS becomes the
+        start receipt), ``"month"`` / ``"year"`` the periodic month/year receipts.
+        """
         self.ensure_one()
+        if receipt_type != "0" and receipt_type not in PERIOD_TYPES:
+            raise UserError(self.env._("Unknown receipt type %s.", receipt_type))
 
         if self.has_active_session:
             raise UserError(
@@ -361,9 +373,12 @@ class PosConfig(models.Model):
             }
         )
 
-        session.set_opening_control(
-            cash_register_balance_start, self.env._("Zero Receipt")
-        )
+        labels = {
+            "0": self.env._("Zero Receipt"),
+            "month": self.env._("Month Receipt"),
+            "year": self.env._("Year Receipt"),
+        }
+        session.set_opening_control(cash_register_balance_start, labels[receipt_type])
         session.cash_register_balance_end_real = cash_register_balance_end_real
 
         date_order = fields.Datetime.to_string(fields.Datetime.now())
@@ -377,7 +392,7 @@ class PosConfig(models.Model):
             "to_invoice": False,
             "shipping_date": None,
             "asign_state": "u",
-            "asign_type": "0",
+            "asign_type": receipt_type,
             "session_id": session.id,
             "user_id": self.env.uid,
             "amount_paid": 0.0,
@@ -394,7 +409,111 @@ class PosConfig(models.Model):
         zero_order.ensure_one()
         if zero_order.asign_state != "s":
             raise ValidationError(self.env._("Created zero-receipt was not signed."))
+        if zero_order.asign_type in ("s", "year"):
+            self._asign_check_receipt(zero_order)
         return zero_order
+
+    def _asign_check_receipt(self, order):
+        """Check that a start/year receipt is signed and its JWS is well formed.
+
+        shortcut: only the structure is checked (signed, three JWS parts,
+        decodable header/signature, signature equals the one in the QR code).
+        The cryptographic verification against the certificate is done by the
+        DEP check (tests/regcheck); upgrade here once a Python verifier exists.
+        On failure a warning is logged and posted on the receipt's chatter
+        (``pos.config`` itself has no chatter). Returns whether the receipt is ok.
+        """
+        self.ensure_one()
+        error = None
+        if order.asign_state != "s":
+            error = self.env._("receipt is not signed")
+        else:
+            try:
+                header, _payload, signature = order.asign_dep.split(".")
+                asign_b64urldecode_nopadding(header)
+                sig = base64.b64encode(asign_b64urldecode_nopadding(signature))
+                if not order.asign_qrcode.endswith("_" + sig.decode()):
+                    error = self.env._("signature does not match QR code")
+            except ValueError:
+                error = self.env._("malformed JWS")
+        if error:
+            _logger.warning(
+                "**RKSV** check of %s receipt %s failed for POS %s: %s",
+                order.asign_type,
+                order.name,
+                self.name,
+                error,
+            )
+            order.message_post(body=self.env._("RKSV receipt check failed: %s", error))
+        return not error
+
+    def _asign_period_receipt(self, receipt_type, period_start):
+        """Create the month/year receipt unless one exists since ``period_start``."""
+        self.ensure_one()
+        if self.has_active_session:
+            _logger.warning(
+                "**RKSV** %s receipt skipped, POS %s has open sessions",
+                receipt_type,
+                self.name,
+            )
+            return False
+        if not self._get_asign_start_order():
+            _logger.warning(
+                "**RKSV** %s receipt skipped, POS %s has no start receipt",
+                receipt_type,
+                self.name,
+            )
+            return False
+        existing = self.env["pos.order"].search_count(
+            [
+                ("config_id", "=", self.id),
+                ("asign_type", "=", receipt_type),
+                ("date_order", ">=", period_start),
+            ]
+        )
+        if existing:
+            return False
+        return self._asign_create_zero_receipt(receipt_type)
+
+    @api.model
+    def _asign_period_start(self, receipt_type, now=None):
+        """Return the start of the current month/year in Austrian time.
+
+        The result is a naive UTC datetime, comparable with ``date_order``.
+        ``now`` is a naive UTC datetime (default: current time).
+        """
+        now = pytz.utc.localize(now or fields.Datetime.now())
+        local = now.astimezone(TIMEZONE_AT)
+        start = local.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if receipt_type == "year":
+            start = start.replace(month=1)
+        return start.astimezone(pytz.utc).replace(tzinfo=None)
+
+    def _cron_asign_period_receipt(self, receipt_type):
+        configs = self or self.search(
+            [
+                ("asign_enabled", "=", True),
+                ("asign_state", "in", ["assigned", "active"]),
+            ]
+        )
+        period_start = self._asign_period_start(receipt_type)
+        for config in configs:
+            try:
+                with self.env.cr.savepoint():
+                    config._asign_period_receipt(receipt_type, period_start)
+            except (UserError, ValidationError):
+                _logger.exception(
+                    "**RKSV** %s receipt failed for POS %s", receipt_type, config.name
+                )
+
+    # The month/year receipt deadlines are legal obligations of the RKSV: verify
+    # them against bmf.gv.at. The crons run daily; the per-period check in
+    # _asign_period_receipt keeps them idempotent.
+    def _cron_asign_month_receipt(self):
+        self._cron_asign_period_receipt("month")
+
+    def _cron_asign_year_receipt(self):
+        self._cron_asign_period_receipt("year")
 
     def _asign_repair_signed_names(self):
         """Restore names of signed receipts overwritten by a concurrent cancel.
@@ -477,3 +596,27 @@ class PosConfig(models.Model):
 
     def action_asign_zero_receipt(self):
         self._asign_create_zero_receipt()
+
+    def action_asign_dep_export(self):
+        """Download the DEP export (JSON) of this POS.
+
+        The attachment belongs to the user only (no res_model/res_id) and older
+        exports of this POS by the same user are removed first.
+        """
+        self.ensure_one()
+        name = f"dep-{self.asign_pid or self.id}.json"
+        self.env["ir.attachment"].search(
+            [("name", "=", name), ("create_uid", "=", self.env.uid)]
+        ).unlink()
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": name,
+                "raw": json.dumps(self._asign_dep_export(), indent=2).encode(),
+                "mimetype": "application/json",
+            }
+        )
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{attachment.id}?download=true",
+            "target": "self",
+        }

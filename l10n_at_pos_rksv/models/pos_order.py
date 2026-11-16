@@ -24,6 +24,8 @@ except pytz.UnknownTimeZoneError:
 
 B64_STO = base64.b64encode(b"STO").decode()
 B64_TRA = base64.b64encode(b"TRA").decode()
+# asign_type of the periodic zero receipts (month / year receipt).
+PERIOD_TYPES = ("month", "year")
 
 ASIGN_SUITE_ID = "R1-AT1"
 ASIGN_ENDPOINT = "https://www.a-trust.at/asignrkonline/v2"
@@ -65,6 +67,8 @@ class PosOrder(models.Model):
             ("c", "Cancel"),
             ("m", "Mixed"),
             ("t", "Training"),
+            ("month", "Month"),
+            ("year", "Year"),
         ],
         string="a.sign Type",
         index=True,
@@ -245,7 +249,8 @@ class PosOrder(models.Model):
             encoded_turnover = B64_TRA
         else:
             if not amounts["amount"]:
-                asign_type = "0"
+                # Month/year receipts are zero receipts that keep their type.
+                asign_type = self.asign_type if self.asign_type in PERIOD_TYPES else "0"
                 if not last_order:
                     asign_type = "s"
 

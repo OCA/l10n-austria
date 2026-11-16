@@ -49,8 +49,18 @@
   `name`/`asign_state` – backend refunds (`refund()` uses `copy()`) must not inherit the
   original signature; they draw their own gapless `asign_seq` and are signed as `STO`
   when paid.
-- `pos.config._asign_create_zero_receipt()` – produces start/zero receipts required by
-  the RKSV (`asign_type` `s` for the very first one, `0` afterwards).
+- `pos.config._asign_create_zero_receipt(receipt_type="0")` – produces start/zero
+  receipts required by the RKSV (`asign_type` `s` for the very first one, `0`
+  afterwards); `receipt_type` `month` / `year` creates the periodic month/year receipt
+  (`asign_type` `month` / `year`, signed as zero receipts). Start and year receipts are
+  checked by `_asign_check_receipt()` (signed, JWS well formed and equal to the QR
+  signature; failure is logged and posted on the receipt chatter; structure check only).
+- Crons `pos_config_ir_cron_month_receipt` / `_year_receipt` – call
+  `_cron_asign_month_receipt` / `_cron_asign_year_receipt` for all active POS; skip POS
+  with an open session or without start receipt, and POS that already have a receipt of
+  that type in the current month/year. Verify legal deadlines against bmf.gv.at.
+- `pos.config.action_asign_dep_export()` – downloads `_asign_dep_export()` as JSON
+  attachment (button _Export DEP_).
 - `pos.config._asign_repair_signed_names()` – restores names of already signed receipts
   whose name was reset to `'/'` by a concurrent cancel (lost-update race); the signature
   stays valid, only the name is recomputed from `asign_seq`. Runs inside
@@ -65,9 +75,9 @@
 - POS settings inherit (`res_config_settings_views.xml`) – RKSV section.
 - POS list/form inherits (`pos_order_views.xml`) – RKSV signature fields.
 - POS receipt inherit (`static/src/overrides/order_receipt.xml`) – prints the RKSV
-  receipt number (`order.name`), the QR code, serial and STARTBELEG/NULLBELEG/STORNO
+  receipt number (`order.name`), the QR code, serial and STARTBELEG/NULLBELEG/MONATSBELEG/JAHRESBELEG/STORNO
   markers.
-- POS configuration form (`pos_config_views.xml`) – _Create Zero-Receipt_.
+- POS configuration form (`pos_config_views.xml`) – _Create Zero-Receipt_, _Export DEP_.
 - Tax-group inherits (`account_tax_views.xml`) – RKSV tax category.
 - Certificate views and menu (`asign_views.xml`) under _Point of Sale > Configuration >
   a.sign RKSV_.
